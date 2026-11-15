@@ -1,0 +1,123 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
+| Date         : Sun Nov 15 12:24:13 2026
+| Host         : LAPTOP-N9F2OTPF running 64-bit major release  (build 9200)
+| Command      : report_methodology -file C:/vivado_verilog_proj/NOC_PQATTEST/NOC_PQATTEST.runs/impl_merged/gate/methodology_routed.rpt
+| Design       : pq_merged_board_top
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Fully Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Report Methodology
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: design_1
+      Design limits: <entire design considered>
+             Max violations: <unlimited>
+             Violations found: 12
++--------+----------+------------------------------------------+------------+
+| Rule   | Severity | Description                              | Violations |
++--------+----------+------------------------------------------+------------+
+| XDCH-2 | Warning  | Same min and max delay values on IO port | 11         |
+| RTGT-1 | Advisory | RAM retargeting possibility              | 1          |
++--------+----------+------------------------------------------+------------+
+
+2. REPORT DETAILS
+-----------------
+XDCH-2#1 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'btn[0]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{btn[*]} {sw[*]}}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 32)
+Related violations: <none>
+
+XDCH-2#2 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'btn[1]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{btn[*]} {sw[*]}}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 32)
+Related violations: <none>
+
+XDCH-2#3 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'btn[2]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{btn[*]} {sw[*]}}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 32)
+Related violations: <none>
+
+XDCH-2#4 Warning
+Same min and max delay values on IO port  
+The same input delay of 0.000 ns has been defined on port 'sw[0]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_input_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{btn[*]} {sw[*]}}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 32)
+Related violations: <none>
+
+XDCH-2#5 Warning
+Same min and max delay values on IO port  
+The same output delay of 0.000 ns has been defined on port 'led0_g' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_output_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{led[*]} led0_r led0_g uart_rxd_out}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 33)
+Related violations: <none>
+
+XDCH-2#6 Warning
+Same min and max delay values on IO port  
+The same output delay of 0.000 ns has been defined on port 'led0_r' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_output_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{led[*]} led0_r led0_g uart_rxd_out}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 33)
+Related violations: <none>
+
+XDCH-2#7 Warning
+Same min and max delay values on IO port  
+The same output delay of 0.000 ns has been defined on port 'led[0]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_output_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{led[*]} led0_r led0_g uart_rxd_out}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 33)
+Related violations: <none>
+
+XDCH-2#8 Warning
+Same min and max delay values on IO port  
+The same output delay of 0.000 ns has been defined on port 'led[1]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_output_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{led[*]} led0_r led0_g uart_rxd_out}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 33)
+Related violations: <none>
+
+XDCH-2#9 Warning
+Same min and max delay values on IO port  
+The same output delay of 0.000 ns has been defined on port 'led[2]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_output_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{led[*]} led0_r led0_g uart_rxd_out}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 33)
+Related violations: <none>
+
+XDCH-2#10 Warning
+Same min and max delay values on IO port  
+The same output delay of 0.000 ns has been defined on port 'led[3]' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_output_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{led[*]} led0_r led0_g uart_rxd_out}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 33)
+Related violations: <none>
+
+XDCH-2#11 Warning
+Same min and max delay values on IO port  
+The same output delay of 0.000 ns has been defined on port 'uart_rxd_out' relative to clock clk50_mmcm for both max and min. Make sure this reflects the design intent.
+set_output_delay -clock [get_clocks -of_objects [get_pins -hierarchical -filter {NAME =~ *u_mmcm/CLKOUT0}]] 0.000 [get_ports {{led[*]} led0_r led0_g uart_rxd_out}]
+C:/vivado_verilog_proj/NOC_PQATTEST/synth/merged/pq_merged_board_arty.xdc (Line: 33)
+Related violations: <none>
+
+RTGT-1#1 Advisory
+RAM retargeting possibility  
+Identified 6 RAM32X1D primitives that could be retargeted to RAM32M. Retargeting will save approximately 2 memory LUTs and improve routability. These can usually be achieved using synthesis inference or XPMs. The memories are u_core/u_p7/l2/W[1].l2/pb_reg[0][flit_data]_0_31_30_31,
+u_core/u_p7/l2/W[1].l2/pb_reg[0][flit_data]_0_31_30_31__0,
+u_core/u_p7/l2/W[1].l2/pb_reg[0][flit_type]_0_31_0_0,
+u_core/u_p7/l2/W[1].l2/pb_reg[0][flit_type]_0_31_1_1,
+u_core/u_p7/l2/W[1].l2/pb_reg[0][vc_id]_0_31_0_0
+u_core/u_p7/l2/W[1].l2/pb_reg[0][vc_id]_0_31_1_1
+Related violations: <none>
+
+

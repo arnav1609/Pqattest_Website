@@ -1,0 +1,94 @@
+{
+  "secure": {
+    "workload_cycles": 3577,
+    "transactions_per_cycle": 0.01789208834218619,
+    "raw_log": "C:\\vivado_verilog_proj\\NOC_PQATTEST\\reports\\dual_lane_10_20261114_114143_ce2c2eba\\i27r2_matched_secure\\workspace\\dual_job.sim\\sim_1\\behav\\xsim\\simulate.log",
+    "raw_sha256": "de7f18bf82b517b64f7f883bfb3b82f6bef51dd040340ba0ee36e10f51235732",
+    "source_run": "dual_lane_10_20261114_114143_ce2c2eba",
+    "latency": {
+      "read": {
+        "count": 32,
+        "minimum_cycles": 32,
+        "maximum_cycles": 32,
+        "mean_cycles": 32
+      },
+      "write": {
+        "count": 32,
+        "minimum_cycles": 32,
+        "maximum_cycles": 32,
+        "mean_cycles": 32
+      }
+    }
+  },
+  "fixed": {
+    "workload_cycles": 3289,
+    "transactions_per_cycle": 0.01945880206749772,
+    "raw_log": "C:\\vivado_verilog_proj\\NOC_PQATTEST\\reports\\dual_lane_10_20261114_114143_ce2c2eba\\i27r2_matched_fixed\\workspace\\dual_job.sim\\sim_1\\behav\\xsim\\simulate.log",
+    "raw_sha256": "9b048425dec003f9ce8423a00c6737511bf3f6230cc765b8874074f1965acaf4",
+    "source_run": "dual_lane_10_20261114_114143_ce2c2eba",
+    "latency": {
+      "read": {
+        "count": 32,
+        "minimum_cycles": 28,
+        "maximum_cycles": 28,
+        "mean_cycles": 28
+      },
+      "write": {
+        "count": 32,
+        "minimum_cycles": 27,
+        "maximum_cycles": 27,
+        "mean_cycles": 27
+      }
+    }
+  },
+  "secure_contended": {
+    "workload_cycles": 4014,
+    "transactions_per_cycle": 0.015944195316392625,
+    "raw_log": "C:\\vivado_verilog_proj\\NOC_PQATTEST\\reports\\dual_lane_10_20261114_114143_ce2c2eba\\i27r2_matched_secure_contended\\workspace\\dual_job.sim\\sim_1\\behav\\xsim\\simulate.log",
+    "raw_sha256": "bc2936c5a6fc8d89a84b298de20e94ef4ef6442bf712fc832d41ef75fb4a7ffa",
+    "source_run": "dual_lane_10_20261114_114143_ce2c2eba",
+    "latency": {
+      "read": {
+        "count": 32,
+        "minimum_cycles": 32,
+        "maximum_cycles": 459,
+        "mean_cycles": 45.34375
+      },
+      "write": {
+        "count": 32,
+        "minimum_cycles": 32,
+        "maximum_cycles": 42,
+        "mean_cycles": 32.3125
+      }
+    }
+  },
+  "fixed_contended": {
+    "workload_cycles": 3289,
+    "transactions_per_cycle": 0.01945880206749772,
+    "raw_log": "C:\\vivado_verilog_proj\\NOC_PQATTEST\\reports\\dual_lane_10_20261114_114143_ce2c2eba\\i27r2_matched_fixed_contended\\workspace\\dual_job.sim\\sim_1\\behav\\xsim\\simulate.log",
+    "raw_sha256": "aea01c20968bd24c1e1bb72fa0af4be98f573fae67316e4ac9a0b124776de9e4",
+    "source_run": "dual_lane_10_20261114_114143_ce2c2eba",
+    "latency": {
+      "read": {
+        "count": 32,
+        "minimum_cycles": 28,
+        "maximum_cycles": 28,
+        "mean_cycles": 28
+      },
+      "write": {
+        "count": 32,
+        "minimum_cycles": 27,
+        "maximum_cycles": 27,
+        "mean_cycles": 27
+      }
+    }
+  },
+  "control_latency": {
+    "raw_log": "C:\\vivado_verilog_proj\\NOC_PQATTEST\\reports\\dual_lane_10_20261114_114143_ce2c2eba\\i27r2_phase_sweep\\workspace\\dual_job.sim\\sim_1\\behav\\xsim\\simulate.log",
+    "raw_sha256": "8ddacf18d37ea4712eb45db63b5565f6b24e14d8264a208de5de787e07958c7e",
+    "attestation_samples": 21,
+    "revoke_samples": 7,
+    "start_event": "core start_attestation or revoke asserted after measurement valid; excludes button debounce and MMCM startup",
+    "stop_events": "authorization first high or low at negedge observation"
+  }
+}

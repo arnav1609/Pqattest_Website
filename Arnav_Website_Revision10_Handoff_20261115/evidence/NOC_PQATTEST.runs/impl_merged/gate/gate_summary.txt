@@ -1,0 +1,21 @@
+MERGED BOARD GATE | top pq_merged_board_top | Sun Nov 15 12:24:39 +0530 2026 | Vivado 2024.1 | xc7a100tcsg324-1
+clock period 20.000 ns | MMCM CLKOUT0 clock clk50_mmcm generated from sys_clk_pin (10.000 ns) | flow S4 release (mesh split, rebuilt, AreaOptimized_high)
+MG_FW_IMEM_RAMS=4
+MG_FW_INITIALISED=4
+MG_FW_B_RAMS=4
+MG_FW_B_INITIALISED=4
+MG_WNS=0.182
+MG_TNS=0.000
+MG_WHS=0.007
+MG_THS=0.000
+MG_WPWS=3.000
+MG_ROUTE_ERRORS=0
+MG_DRC_ERRORS=0
+MG_CHECK_TIMING=clean
+MG_LUT=39962
+MG_LUTRAM=2098
+MG_FF=29187
+MG_BRAM=20
+MG_DSP=0
+MG_IOB=12
+VERDICT PASS - closed at 20 ns (MMCM), firmware in the netlist

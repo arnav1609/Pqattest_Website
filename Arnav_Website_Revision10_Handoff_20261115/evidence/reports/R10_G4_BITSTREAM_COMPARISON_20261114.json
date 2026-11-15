@@ -1,0 +1,37 @@
+{
+  "builds": [
+    {
+      "directory": "C:\\vivado_verilog_proj\\NOC_PQATTEST\\NOC_PQATTEST.runs_merged\\merged_board_prev_20261114_172753",
+      "whole_sha256": "2d59f7431a265452d90387538549ef1f4d93ff2381bb59a85d9b224c910768ef",
+      "header": {
+        "a": "pq_merged_board_top;UserID=0XFFFFFFFF;Version=2024.1",
+        "b": "7a100tcsg324",
+        "c": "2026/11/14",
+        "d": "17:27:31"
+      },
+      "payload_bytes": 3825788,
+      "payload_sha256": "54228bfc7b7536a48cb27e1538574199d7088fd4ff2f849664d141317204c3dd"
+    },
+    {
+      "directory": "C:\\vivado_verilog_proj\\NOC_PQATTEST\\NOC_PQATTEST.runs_merged\\merged_board",
+      "whole_sha256": "bbc50b68dee4c0e2c3e04ed22e09bc0dffba83f342ad4386dd43c4788add2002",
+      "header": {
+        "a": "pq_merged_board_top;UserID=0XFFFFFFFF;Version=2024.1",
+        "b": "7a100tcsg324",
+        "c": "2026/11/14",
+        "d": "18:42:24"
+      },
+      "payload_bytes": 3825788,
+      "payload_sha256": "54228bfc7b7536a48cb27e1538574199d7088fd4ff2f849664d141317204c3dd"
+    }
+  ],
+  "identical_configuration_payload": true,
+  "differing_byte_offsets": [
+    103,
+    105,
+    106,
+    108,
+    109
+  ],
+  "all_differences_within_header_time": true
+}

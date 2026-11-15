@@ -1,0 +1,118 @@
+{
+ "generated": "2026-11-13T00:25:17.541Z",
+ "commit": "a312f62cfc65200c00bc9166b7e7d89417e1d29d",
+ "files": {
+  "E-GATE": {
+   "path": "NOC_PQATTEST.runs/impl_merged/gate/gate_summary.txt",
+   "bytes": 617,
+   "modified": "2026-11-12T12:04:35.850Z",
+   "sha256": "fb23104877a118dc1b51202aa198d440aa0eb5add16ed107185100262667e60e"
+  },
+  "E-UTIL": {
+   "path": "NOC_PQATTEST.runs/impl_merged/gate/util_hier_routed.rpt",
+   "bytes": 63064,
+   "modified": "2026-11-12T12:04:05.217Z",
+   "sha256": "f15e6de2589f835d2625c8f7b0cc421e740d1cca62651c59b04def47b7d6929e"
+  },
+  "E-XDC": {
+   "path": "synth/merged/pq_merged_board_arty.xdc",
+   "bytes": 2547,
+   "modified": "2026-11-09T20:40:57.301Z",
+   "sha256": "0826117ca2e3294573cbd01256d2caffbbd47075680997cd39d5dc20261ff254"
+  },
+  "E-GATES": {
+   "path": "reports/I13..I26_GATE_*.md",
+   "sha256": null,
+   "note": "not a single file (pattern, folder or out-of-tree run)"
+  },
+  "E-MATCHED": {
+   "path": "reports/dual_lane_10_20261111_124233_d42406c3/i25_matched_data/matched_latency.json",
+   "bytes": 3559,
+   "modified": "2026-11-11T07:26:18.610Z",
+   "sha256": "3cbc2fc570abcbf002c37461cf96e021da9d95a45b130526a7721c3677daf858"
+  },
+  "E-BASE": {
+   "path": "reports/I25_GATE_20261111.md",
+   "bytes": 2954,
+   "modified": "2026-11-11T12:09:08.617Z",
+   "sha256": "4c3df4dccfd0af58c04b80b99eb17934cb3d19c1cf2bf235829474d4f9e93608"
+  },
+  "E-RTL-CORE": {
+   "path": "rtl/dual_lane/merged/pq_soc_merged_core.sv",
+   "bytes": 9467,
+   "modified": "2026-11-09T20:40:57.301Z",
+   "sha256": "840da2ddc4b1c4ce9877ec94fa2e3ef7a2deb9d59503c1877d4dd724fae61508"
+  },
+  "E-RTL-BRIDGE": {
+   "path": "rtl/riscv/tmem_app_bridge.sv",
+   "bytes": 12308,
+   "modified": "2026-11-08T20:25:25.088Z",
+   "sha256": "cc293664ed50336fcd1caa50edeead948f1d2593e940a84a7d338b0bf37b7c2a"
+  },
+  "E-RTL-SUBSYS": {
+   "path": "rtl/dual_lane/pq_noc_subsystem_p7_i9.sv",
+   "bytes": 25355,
+   "modified": "2026-11-05T09:25:17.895Z",
+   "sha256": "871a7953123bdad803fa0e848f89f8b3ae5334b649b00ff93cdec25d94205d26"
+  },
+  "E-CDC": {
+   "path": "(scratch run on NOC_PQATTEST.runs/impl_merged/pq_merged_board_top_postroute_physopt.dcp)",
+   "sha256": null,
+   "note": "not a single file (pattern, folder or out-of-tree run)"
+  },
+  "E-HW": {
+   "path": "reports/HARDWARE_RUN_20261107.md",
+   "bytes": 1397,
+   "modified": "2026-11-07T05:31:01.897Z",
+   "sha256": "8cd2a149ff190b0496c9b35468e6831e0240f39b6a224b04099d937b205d7d9e"
+  },
+  "E-METH": {
+   "path": "NOC_PQATTEST.runs/impl_merged/gate/methodology_routed.rpt",
+   "bytes": 7720,
+   "modified": "2026-11-12T12:04:26.441Z",
+   "sha256": "32532330be2c435245cb0f3bfb984caebb35729cb447a2f86839eece38492b43"
+  },
+  "E-BIT": {
+   "path": "NOC_PQATTEST.runs/impl_merged/pq_merged_board_top.bit",
+   "bytes": 3825904,
+   "modified": "2026-11-12T12:05:24.703Z",
+   "sha256": "2b2518be62ca03d5f9aa154e4a437a29419bac3ec9807044fa24d738256c2913"
+  },
+  "E-SRC-LIST": {
+   "path": "scripts/merged_bitstream_sources.tcl",
+   "bytes": 2978,
+   "modified": "2026-11-09T20:40:57.402Z",
+   "sha256": "c94ba1a327c46c58ece73610dfef6c2a6458508588bd85be7ffb39c23010ab07"
+  },
+  "E-FW": {
+   "path": "sw/riscv/demo_fw_v2.hex",
+   "bytes": 1864,
+   "modified": "2026-11-08T11:41:59.068Z",
+   "sha256": "d1b340172a678aedd068bc89525d8bc061fba5c6ec931ff763e467deeec58ec9"
+  },
+  "E-TOP": {
+   "path": "synth/merged/pq_merged_board_top.sv",
+   "bytes": 8465,
+   "modified": "2026-11-09T20:40:57.301Z",
+   "sha256": "520ce2ef07520675664df470497149bab53cf4d76c1df5c437481a787401cb94"
+  },
+  "E-PKG": {
+   "path": "rtl/dual_lane/NOC_PKG.sv",
+   "bytes": 20632,
+   "modified": "2026-10-08T09:18:44.452Z",
+   "sha256": "e428af103c9a0096f47f9ad97215a33b919dc9035c2a5e9d1255ff9fdd33a7be"
+  },
+  "E-L2": {
+   "path": "rtl/dual_lane/noc_l2_auth_p7_i9.sv",
+   "bytes": 18832,
+   "modified": "2026-11-05T09:25:17.895Z",
+   "sha256": "84a9bea5569a6a61b9d9a47717e0828565359d1ab1f26ebdd0ca5f9883500933"
+  },
+  "E-VER": {
+   "path": "rtl/dual_lane/pq_rot_verifier.sv",
+   "bytes": 8647,
+   "modified": "2026-11-02T17:24:06.529Z",
+   "sha256": "e9894b57ca05e2d1acf1baa3fcfe320d3462f29f40936fadbdd4af0c537dedaa"
+  }
+ }
+}

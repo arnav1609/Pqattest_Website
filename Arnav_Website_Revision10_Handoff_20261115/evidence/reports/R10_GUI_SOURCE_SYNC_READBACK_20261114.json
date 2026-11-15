@@ -1,0 +1,15 @@
+{
+  "source_project": "copy of owner NOC_PQATTEST.xpr; original unchanged",
+  "gui_file_count": 73,
+  "hasher_file": "$PPRDIR/../NOC_PQATTEST/rtl/riscv/meas_imem_hasher.sv",
+  "firmware_file": "$PPRDIR/../NOC_PQATTEST/sw/riscv/demo_fw_v3.hex",
+  "firmware_words": 4096,
+  "firmware_sha256": "43c62fbcf6e8772c5c77eab2a3739a3593ccdc94c9b6de8baa7d7bdcd733ec8a",
+  "idempotent_second_sync": true,
+  "physical_gui_gate": "PASS",
+  "mesh_cell": "u_core/u_p7/mesh",
+  "mesh_primitive_cells": 17236,
+  "full_implemented_top_opened": true,
+  "gui_metrics_match_both_g4": true,
+  "gui_sha256": "f633b14c02173066fc38689bd5b4e7cdcda53e3a63e473ccfe5b4a295f6a52a2"
+}

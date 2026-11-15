@@ -1,0 +1,30 @@
+{
+  "refs": [
+    { "id": "E-GATE", "title": "Board gate summary, 12 Nov 2026 build", "kind": "Vivado post-route gate", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "Timing, routing, design-rule and firmware-presence checks all passed for the image built on 12 Nov.", "limits": "Static timing and rule checks only; not a board test." },
+    { "id": "E-UTIL", "title": "Post-route hierarchical utilization, 12 Nov 2026 build", "kind": "Vivado utilization report", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "LUT, flip-flop and block-RAM counts per block.", "limits": "The mesh is synthesised separately with its hierarchy kept; the rest uses rebuilt hierarchy, so small blocks can be absorbed into parents." },
+    { "id": "E-XDC", "title": "Board constraints", "kind": "Constraint file", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "One 100 MHz input clock and 12 constrained pins.", "limits": "None." },
+    { "id": "E-PART", "title": "Device part name", "kind": "Project setting", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DERIVED",
+      "says": "xc7a100tcsg324-1: a 324-ball package.", "limits": "The drawn package is conceptual." },
+    { "id": "E-GATES", "title": "Verification gate reports, increments I-13 to I-26", "kind": "XSim regression records", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DERIVED",
+      "says": "The registered simulation jobs for these increments passed, including negative tests.", "limits": "Summarised from the gate reports; not re-run or independently reviewed for this site. An independent RTL sign-off audit is still open." },
+    { "id": "E-MATCHED", "title": "Matched latency experiment, 11 Nov 2026", "kind": "XSim measurement", "date": "2026-11-11", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "64 memory transactions per mode: request-to-response cycles and workload throughput, secure design against the fixed-admission baseline.", "limits": "Simulation of one workload. The baseline is a research build, never a release image." },
+    { "id": "E-BASE", "title": "Fixed-admission research baseline build, 11 Nov 2026", "kind": "Vivado post-route", "date": "2026-11-11", "currency": "CURRENT_BUILD", "confidence": "DERIVED",
+      "says": "Same mesh, network interfaces and memory front end with cryptography and admission control removed.", "limits": "Research comparison only." },
+    { "id": "E-RTL-CORE", "title": "Merged core source", "kind": "RTL source", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "Tile assignment, the measurement path from CPU A to the endpoint, tile 1 with no application, and the SPOOF port tied off.", "limits": "Read directly; not a simulation result." },
+    { "id": "E-RTL-BRIDGE", "title": "TMEM to NoC bridge source", "kind": "RTL source", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "A request is never raised while the tile is not authorized; the refusal is local.", "limits": "Read directly; not a simulation result." },
+    { "id": "E-RTL-SUBSYS", "title": "NoC subsystem source", "kind": "RTL source", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "Tile numbering, attestable tiles 3 and 4, memory authorization at the time of access. Package and link sources confirm 32-bit flits, 3 virtual channels with 4-flit buffers and their roles, the 128-bit tag, 80-bit epoch, 64-bit sequence number with replay rejection, the 224-bit challenge, and that GRANT and REVOKE are sent as packets on the same channel and path.", "limits": "Read directly; not a simulation result." },
+    { "id": "E-CDC", "title": "Clock-domain crossing report, 12 Nov 2026 build", "kind": "Vivado report_cdc", "date": "2026-11-12", "currency": "CURRENT_BUILD", "confidence": "DIRECT",
+      "says": "report_cdc lists no clock-to-clock crossings; check_timing reports 0 unclocked pins, 0 unconstrained endpoints, 0 loops and 0 latch loops.", "limits": "Structural analysis by the tool on the routed design. It does not judge the asynchronous board inputs, which are declared false paths." },
+    { "id": "E-HW", "title": "Board run record, 7 Nov 2026", "kind": "Owner report", "date": "2026-11-07", "currency": "HISTORICAL", "confidence": "UNVERIFIED",
+      "says": "The project owner reported \"Board shows PASS\" for the 7 Nov image.", "limits": "An earlier image. Individual observations (LEDs, UART text, revoke, re-attest) were not itemised." },
+    { "id": "E-PROP", "title": "Original one-page proposal", "kind": "Proposal", "date": "2026-07-26", "currency": "HISTORICAL", "confidence": "DIRECT",
+      "says": "The original plan.", "limits": "A plan, not evidence of what was built." }
+  ]
+}

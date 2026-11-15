@@ -1,0 +1,1084 @@
+{
+  "build": {
+    "id": "B-20261112-1735",
+    "label": "12 Nov 2026 build",
+    "device": "xc7a100tcsg324-1",
+    "board": "Arty A7-100T",
+    "tool": "Vivado 2024.1",
+    "clock": "one 50 MHz clock (board 100 MHz through an MMCM)",
+    "top": "pq_merged_board_top",
+    "areaConstant": 0.012
+  },
+  "defaults": {
+    "representation": "CONCEPTUAL",
+    "currency": "CURRENT_BUILD",
+    "confidence": "DIRECT",
+    "maturity": "ROUTED",
+    "clockDomain": "clk50_mmcm (50 MHz)",
+    "resetDomain": "rst, active high, synchronous release",
+    "placementBasis": "Illustrative position chosen for clarity; not Vivado placement",
+    "geometryRule": "Footprint area proportional to post-route LUT count",
+    "evidenceRefs": [
+      "E-UTIL"
+    ],
+    "interfaces": [],
+    "scenarioRefs": [],
+    "metrics": {}
+  },
+  "tiles": [
+    {
+      "id": 0,
+      "x": 0,
+      "y": 0,
+      "role": "RISC-V CPU tile B (never authorized)",
+      "name": "RISC-V CPU B",
+      "primary": "cpuB",
+      "purpose": "A processor that is never allowed to use the shared memory. It shows that an untrusted tile is stopped inside its own tile.",
+      "does": [
+        "Runs the same demo firmware as CPU A.",
+        "Its memory requests are refused by its own bridge, so nothing reaches the network.",
+        "Prints “T0 REFUSED” on the UART and lights the RGB LED."
+      ]
+    },
+    {
+      "id": 1,
+      "x": 1,
+      "y": 0,
+      "role": "Network interface only; no application in this build",
+      "name": "Network tile",
+      "primary": "ni1",
+      "purpose": "A router and network interface with nothing attached. It still forwards packets that pass through it, such as memory replies on their way back to tile 3.",
+      "does": [
+        "Forwards packets across the top row of the mesh.",
+        "Has no processor or memory of its own in this build."
+      ]
+    },
+    {
+      "id": 2,
+      "x": 2,
+      "y": 0,
+      "role": "Shared memory behind the memory front end",
+      "name": "Shared memory",
+      "primary": "bram",
+      "purpose": "Memory that the processors share over the network. Its front end checks, on every access, that the sender is allowed in.",
+      "does": [
+        "Receives write and read requests from the network.",
+        "Checks the sender’s permission at the moment of each access.",
+        "Sends read data back to the requesting tile."
+      ]
+    },
+    {
+      "id": 3,
+      "x": 0,
+      "y": 1,
+      "role": "RISC-V CPU tile A with the PQ-Attest endpoint (the attested tile)",
+      "name": "RISC-V CPU A",
+      "primary": "cpuA",
+      "purpose": "The processor that must prove it can be trusted before it may use the shared memory.",
+      "does": [
+        "Measures its own firmware (the first 64 bytes of its instruction memory) with SHA3-256.",
+        "Answers the root of trust’s challenge with that measurement and a KMAC128 tag.",
+        "Once granted, writes 0xC0DE5A5A to the shared memory, reads it back and prints “T3 PASS”."
+      ]
+    },
+    {
+      "id": 4,
+      "x": 1,
+      "y": 1,
+      "role": "Root of trust: RoT verifier",
+      "name": "Root of trust",
+      "primary": "ver",
+      "purpose": "The security controller. It challenges tile 3, checks the answer and decides whether tile 3 may use the shared memory.",
+      "does": [
+        "Sends CHALLENGE, GRANT and REVOKE to tile 3.",
+        "Checks the measurement and tag that tile 3 returns.",
+        "Starts after reset and again on button 1; button 2 revokes."
+      ]
+    },
+    {
+      "id": 5,
+      "x": 2,
+      "y": 1,
+      "role": "Untrusted SPOOF injection port behind an ingress quarantine",
+      "name": "Untrusted port",
+      "primary": "quar",
+      "purpose": "A port used in simulation to inject forged packets. Its quarantine rejects them before they reach the network.",
+      "does": [
+        "Holds incoming packets in a quarantine and rejects forged ones.",
+        "Tied off in the board image, so it is only exercised in simulation."
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "board",
+      "name": "Board (crop)",
+      "type": "board",
+      "tileId": null,
+      "parentId": null,
+      "modulePath": "-",
+      "maturity": "SPECIFIED",
+      "confidence": "DERIVED",
+      "geometry": {
+        "x": 0,
+        "z": 0,
+        "w": 150,
+        "d": 100,
+        "h": 1.4
+      },
+      "geometryRule": "Fixed size; not to scale",
+      "evidenceRefs": [
+        "E-XDC"
+      ],
+      "summary": "A cropped, illustrative board. Only the parts the design uses are drawn: the 100 MHz clock source, two buttons, a switch, LEDs and the UART.",
+      "detail": [
+        "12 pins are constrained: clock, 3 buttons, 1 switch, 6 LED outputs, UART TX.",
+        "Part positions are not the real Arty A7 layout."
+      ]
+    },
+    {
+      "id": "pkg",
+      "name": "Package (conceptual)",
+      "type": "package",
+      "tileId": null,
+      "parentId": "board",
+      "modulePath": "-",
+      "maturity": "SPECIFIED",
+      "confidence": "DERIVED",
+      "geometry": {
+        "x": 0,
+        "z": 0,
+        "w": 78,
+        "d": 56,
+        "h": 1
+      },
+      "geometryRule": "Fixed size; not to scale",
+      "evidenceRefs": [
+        "E-PART"
+      ],
+      "summary": "A conceptual package with the die exposed so the blocks can be seen. The real device is a 324-ball chip-scale BGA; its die is not visible.",
+      "detail": [
+        "The 18 x 18 ball grid on the underside matches the 324 balls in the part name (csg324).",
+        "Ball functions are not drawn."
+      ]
+    },
+    {
+      "id": "die",
+      "name": "Design area (conceptual die)",
+      "type": "die",
+      "tileId": null,
+      "parentId": "pkg",
+      "modulePath": "pq_merged_board_top",
+      "confidence": "DIRECT",
+      "geometry": {
+        "x": 0,
+        "z": 0,
+        "w": 60,
+        "d": 40,
+        "h": 0.5
+      },
+      "geometryRule": "Fixed size; holds the logical blocks",
+      "evidenceRefs": [
+        "E-GATE",
+        "E-UTIL"
+      ],
+      "metrics": {
+        "lut": 34952,
+        "ff": 25328,
+        "bram": 20
+      },
+      "ports": [
+        [
+          "CLK100MHZ",
+          "input, 100 MHz board clock"
+        ],
+        [
+          "btn[2:0]",
+          "input, buttons: reset, re-attest, revoke"
+        ],
+        [
+          "sw[0]",
+          "input, selects which CPU's UART is sent out"
+        ],
+        [
+          "led[3:0]",
+          "output"
+        ],
+        [
+          "led0_r, led0_g",
+          "outputs"
+        ],
+        [
+          "uart_rxd_out",
+          "output, UART transmit to the host"
+        ]
+      ],
+      "interfaces": [
+        "12 board pins; no bus interface leaves the design"
+      ],
+      "summary": "The whole design as built for the FPGA: 34,952 LUTs, 25,328 flip-flops and 20 block RAMs, about 55 % of the device's LUTs.",
+      "detail": [
+        "This is FPGA logic, not a fabricated chip. No ASIC exists.",
+        "Timing met at 20 ns: worst setup slack +0.120 ns, worst hold slack +0.009 ns."
+      ]
+    },
+    {
+      "id": "r0",
+      "name": "Router R0",
+      "type": "router",
+      "tileId": 0,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/mesh (noc_router)",
+      "geometry": {
+        "x": -19,
+        "z": -4,
+        "h": 0.9
+      },
+      "metrics": {
+        "lutShare": 1705,
+        "bram": 0,
+        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+      }
+    },
+    {
+      "id": "r1",
+      "name": "Router R1",
+      "type": "router",
+      "tileId": 1,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/mesh (noc_router)",
+      "geometry": {
+        "x": 0,
+        "z": -4,
+        "h": 0.9
+      },
+      "metrics": {
+        "lutShare": 1705,
+        "bram": 0,
+        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+      }
+    },
+    {
+      "id": "r2",
+      "name": "Router R2",
+      "type": "router",
+      "tileId": 2,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/mesh (noc_router)",
+      "geometry": {
+        "x": 19,
+        "z": -4,
+        "h": 0.9
+      },
+      "metrics": {
+        "lutShare": 1705,
+        "bram": 0,
+        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+      }
+    },
+    {
+      "id": "r3",
+      "name": "Router R3",
+      "type": "router",
+      "tileId": 3,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/mesh (noc_router)",
+      "geometry": {
+        "x": -19,
+        "z": 4,
+        "h": 0.9
+      },
+      "metrics": {
+        "lutShare": 1705,
+        "bram": 0,
+        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+      }
+    },
+    {
+      "id": "r4",
+      "name": "Router R4",
+      "type": "router",
+      "tileId": 4,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/mesh (noc_router)",
+      "geometry": {
+        "x": 0,
+        "z": 4,
+        "h": 0.9
+      },
+      "metrics": {
+        "lutShare": 1705,
+        "bram": 0,
+        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+      }
+    },
+    {
+      "id": "r5",
+      "name": "Router R5",
+      "type": "router",
+      "tileId": 5,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/mesh (noc_router)",
+      "geometry": {
+        "x": 19,
+        "z": 4,
+        "h": 0.9
+      },
+      "metrics": {
+        "lutShare": 1705,
+        "bram": 0,
+        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+      }
+    },
+    {
+      "id": "ni0",
+      "name": "Network interface, tile 0",
+      "type": "ni",
+      "tileId": 0,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/GN[0].PLAIN.ni",
+      "geometry": {
+        "x": -19,
+        "z": -7.9,
+        "w": 2.2,
+        "d": 1.2,
+        "h": 0.5
+      },
+      "metrics": {
+        "lut": 29,
+        "ff": 18,
+        "bram": 0
+      }
+    },
+    {
+      "id": "ni1",
+      "name": "Network interface, tile 1",
+      "type": "ni",
+      "tileId": 1,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/GN[1].PLAIN.ni",
+      "geometry": {
+        "x": 0,
+        "z": -7.9,
+        "w": 2.2,
+        "d": 1.2,
+        "h": 0.5
+      },
+      "metrics": {
+        "lut": 32,
+        "ff": 18,
+        "bram": 0
+      }
+    },
+    {
+      "id": "ni2",
+      "name": "Network interface, tile 2",
+      "type": "ni",
+      "tileId": 2,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/GN[2].PLAIN.ni",
+      "geometry": {
+        "x": 19,
+        "z": -7.9,
+        "w": 2.2,
+        "d": 1.2,
+        "h": 0.5
+      },
+      "metrics": {
+        "lut": 276,
+        "ff": 103,
+        "bram": 0
+      }
+    },
+    {
+      "id": "ni3",
+      "name": "Network interface, tile 3",
+      "type": "ni",
+      "tileId": 3,
+      "parentId": "l2",
+      "modulePath": "u_core/u_p7/l2 (inside the L2 pair)",
+      "geometry": {
+        "x": -19,
+        "z": 7.9,
+        "w": 2.2,
+        "d": 1.2,
+        "h": 0.5
+      },
+      "metrics": {
+        "note": "Not separately measured: counted inside the L2 authenticated link"
+      }
+    },
+    {
+      "id": "ni4",
+      "name": "Network interface, tile 4",
+      "type": "ni",
+      "tileId": 4,
+      "parentId": "l2",
+      "modulePath": "u_core/u_p7/l2 (inside the L2 pair)",
+      "geometry": {
+        "x": 0,
+        "z": 7.9,
+        "w": 2.2,
+        "d": 1.2,
+        "h": 0.5
+      },
+      "metrics": {
+        "note": "Not separately measured: counted inside the L2 authenticated link"
+      }
+    },
+    {
+      "id": "ni5",
+      "name": "Network interface, tile 5",
+      "type": "ni",
+      "tileId": 5,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/GN[5].PLAIN.ni",
+      "geometry": {
+        "x": 19,
+        "z": 7.9,
+        "w": 2.2,
+        "d": 1.2,
+        "h": 0.5
+      },
+      "metrics": {
+        "lut": 32,
+        "ff": 18,
+        "bram": 0
+      }
+    },
+    {
+      "id": "cpuB",
+      "name": "RISC-V CPU tile B",
+      "type": "cpu",
+      "tileId": 0,
+      "parentId": "die",
+      "modulePath": "u_core/u_cpu_b (cpu_tile_noc)",
+      "geometry": {
+        "x": -19,
+        "z": -13.2,
+        "h": 0.7
+      },
+      "metrics": {
+        "lut": 2561,
+        "ff": 1585,
+        "bram": 8
+      },
+      "scenarioRefs": [
+        "boot",
+        "refuse"
+      ],
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-RTL-BRIDGE"
+      ],
+      "interfaces": [
+        "TMEM bridge to NI 0",
+        "UART TX",
+        "GPIO (LEDs)"
+      ],
+      "summary": "A PicoRV32 processor that is never authorized. When its program asks for the shared memory, its own bridge refuses on the spot and nothing is sent into the network.",
+      "detail": [
+        "Runs the same demo firmware as CPU A (RV32I assembly).",
+        "Prints \"T0 REFUSED\" on the UART and sets LED pattern 0010.",
+        "The refused CPU receives a poison value in place of data."
+      ]
+    },
+    {
+      "id": "cpuB.core",
+      "name": "PicoRV32 core and peripherals",
+      "type": "sub",
+      "tileId": 0,
+      "parentId": "cpuB",
+      "modulePath": "u_core/u_cpu_b/u_tile (tile_top)",
+      "geometry": {
+        "slot": 0
+      },
+      "metrics": {
+        "lut": 2527,
+        "ff": 1551,
+        "bram": 0
+      },
+      "summary": "The processor with its adapter, address decoder, status registers, UART and GPIO."
+    },
+    {
+      "id": "cpuB.mem",
+      "name": "Local memories",
+      "type": "sub",
+      "tileId": 0,
+      "parentId": "cpuB",
+      "modulePath": "u_core/u_cpu_b/u_mem (tile_mem_wrapper)",
+      "geometry": {
+        "slot": 1
+      },
+      "metrics": {
+        "lut": 24,
+        "ff": 2,
+        "bram": 8
+      },
+      "summary": "Instruction and data memory in block RAM. The firmware image is loaded into the instruction memory."
+    },
+    {
+      "id": "cpuB.meas",
+      "name": "Measurement window reader",
+      "type": "sub",
+      "tileId": 0,
+      "parentId": "cpuB",
+      "modulePath": "u_core/u_cpu_b/u_meas (meas_window_reader)",
+      "geometry": {
+        "slot": 2
+      },
+      "metrics": {
+        "lut": 7,
+        "ff": 11,
+        "bram": 0
+      },
+      "summary": "Present in every CPU tile. On tile 0 its output is not used for attestation."
+    },
+    {
+      "id": "cpuB.bridge",
+      "name": "TMEM to NoC bridge",
+      "type": "sub",
+      "tileId": 0,
+      "parentId": "cpuB",
+      "modulePath": "u_core/u_cpu_b/u_bridge (tmem_app_bridge)",
+      "geometry": {
+        "slot": 3
+      },
+      "metrics": {
+        "lut": 3,
+        "ff": 20,
+        "bram": 0
+      },
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-RTL-BRIDGE"
+      ],
+      "scenarioRefs": [
+        "refuse"
+      ],
+      "summary": "Turns a processor memory access into a network request. It never raises a request while the tile is not authorized, so tile 0's requests stop here."
+    },
+    {
+      "id": "plain",
+      "name": "Tile 1 (no application)",
+      "type": "plain",
+      "tileId": 1,
+      "parentId": "die",
+      "modulePath": "- (application port tied off in pq_soc_merged_core)",
+      "geometry": {
+        "x": 0,
+        "z": -12.6,
+        "w": 5,
+        "d": 3.6,
+        "h": 0.3
+      },
+      "geometryRule": "Fixed size; not to scale",
+      "metrics": {
+        "note": "No application logic; only the network interface is built"
+      },
+      "evidenceRefs": [
+        "E-RTL-CORE"
+      ],
+      "summary": "This tile has a router and a network interface but no application. It still forwards packets that pass through router R1."
+    },
+    {
+      "id": "memfe",
+      "name": "Memory front end",
+      "type": "mem",
+      "tileId": 2,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7 (logic inside pq_noc_subsystem_p7)",
+      "geometry": {
+        "x": 19,
+        "z": -10.6,
+        "w": 5,
+        "d": 1.6,
+        "h": 0.55
+      },
+      "geometryRule": "Fixed size; not to scale",
+      "metrics": {
+        "note": "Not separately measured: its logic is merged into the network subsystem in the report"
+      },
+      "scenarioRefs": [
+        "access"
+      ],
+      "evidenceRefs": [
+        "E-RTL-SUBSYS"
+      ],
+      "summary": "Stands in front of the shared memory and checks, at the moment of each read or write, that the requesting tile is authorized."
+    },
+    {
+      "id": "bram",
+      "name": "Shared memory",
+      "type": "mem",
+      "tileId": 2,
+      "parentId": "die",
+      "modulePath": "u_core/u_bram (tile2_bram_infer)",
+      "geometry": {
+        "x": 19,
+        "z": -14.6,
+        "w": 8,
+        "d": 4.6,
+        "h": 0.8
+      },
+      "geometryRule": "Fixed size; not to scale (block RAM, no LUTs)",
+      "metrics": {
+        "lut": 0,
+        "ff": 0,
+        "bram": 4
+      },
+      "scenarioRefs": [
+        "access"
+      ],
+      "summary": "Block RAM that the tiles share over the network. In the demo, tile 3 writes 0xC0DE5A5A here and reads it back."
+    },
+    {
+      "id": "cpuA",
+      "name": "RISC-V CPU tile A",
+      "type": "cpu",
+      "tileId": 3,
+      "parentId": "die",
+      "modulePath": "u_core/u_cpu_a (cpu_tile_noc)",
+      "geometry": {
+        "x": -24.4,
+        "z": 12.8,
+        "h": 0.7
+      },
+      "metrics": {
+        "lut": 2691,
+        "ff": 2249,
+        "bram": 8
+      },
+      "scenarioRefs": [
+        "boot",
+        "attest",
+        "access",
+        "revoke"
+      ],
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-RTL-BRIDGE"
+      ],
+      "interfaces": [
+        "TMEM bridge to NI 3",
+        "Measurement window to the endpoint",
+        "UART TX",
+        "GPIO (LEDs)"
+      ],
+      "summary": "A PicoRV32 processor and the one tile that gets attested. Once the root of trust grants access, its program can use the shared memory on tile 2.",
+      "detail": [
+        "Runs the demo firmware (RV32I assembly).",
+        "Prints \"T3 PASS\" on the UART and sets LED pattern 0001 after a correct write and read-back.",
+        "Shares the tile's network port with the PQ-Attest endpoint."
+      ]
+    },
+    {
+      "id": "cpuA.bridge",
+      "name": "TMEM to NoC bridge",
+      "type": "sub",
+      "tileId": 3,
+      "parentId": "cpuA",
+      "modulePath": "u_core/u_cpu_a/u_bridge (tmem_app_bridge)",
+      "geometry": {
+        "slot": 0
+      },
+      "metrics": {
+        "lut": 75,
+        "ff": 167,
+        "bram": 0
+      },
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-RTL-BRIDGE"
+      ],
+      "scenarioRefs": [
+        "access",
+        "revoke"
+      ],
+      "summary": "Turns a processor memory access into a network request and waits for the response. After a revoke it refuses new requests locally."
+    },
+    {
+      "id": "cpuA.meas",
+      "name": "Measurement window reader",
+      "type": "sub",
+      "tileId": 3,
+      "parentId": "cpuA",
+      "modulePath": "u_core/u_cpu_a/u_meas (meas_window_reader)",
+      "geometry": {
+        "slot": 1
+      },
+      "metrics": {
+        "lut": 51,
+        "ff": 524,
+        "bram": 0
+      },
+      "scenarioRefs": [
+        "boot"
+      ],
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-RTL-CORE"
+      ],
+      "summary": "Reads the first 64 bytes of the instruction memory and hands them to the PQ-Attest endpoint, which hashes them as part of the measurement."
+    },
+    {
+      "id": "cpuA.mem",
+      "name": "Local memories",
+      "type": "sub",
+      "tileId": 3,
+      "parentId": "cpuA",
+      "modulePath": "u_core/u_cpu_a/u_mem (tile_mem_wrapper)",
+      "geometry": {
+        "slot": 2
+      },
+      "metrics": {
+        "lut": 26,
+        "ff": 2,
+        "bram": 8
+      },
+      "summary": "Instruction and data memory in block RAM. The firmware image is loaded into the instruction memory."
+    },
+    {
+      "id": "cpuA.core",
+      "name": "PicoRV32 core and peripherals",
+      "type": "sub",
+      "tileId": 3,
+      "parentId": "cpuA",
+      "modulePath": "u_core/u_cpu_a/u_tile (tile_top)",
+      "geometry": {
+        "slot": 3
+      },
+      "metrics": {
+        "lut": 2539,
+        "ff": 1553,
+        "bram": 0
+      },
+      "summary": "The processor with its adapter, address decoder, status registers, UART and GPIO."
+    },
+    {
+      "id": "endp",
+      "name": "PQ-Attest endpoint",
+      "type": "crypto",
+      "tileId": 3,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/endpoint (pq_attest_endpoint)",
+      "geometry": {
+        "x": -14.4,
+        "z": 13.6,
+        "h": 0.85
+      },
+      "metrics": {
+        "lut": 6619,
+        "ff": 8595,
+        "bram": 0
+      },
+      "maturity": "ROUTED",
+      "scenarioRefs": [
+        "boot",
+        "attest",
+        "revoke"
+      ],
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-GATES"
+      ],
+      "interfaces": [
+        "Shares NI 3 with CPU A",
+        "Measurement window from CPU A"
+      ],
+      "summary": "Answers the root of trust for tile 3. It measures the tile with SHA3-256 and returns the measurement with a KMAC128 tag.",
+      "detail": [
+        "Measurement input: tile ID, configuration and a 64-byte window of the instruction memory.",
+        "Challenge 224 bits; response payload 512 bits (measurement and tag).",
+        "Symmetric cryptography only. No signature scheme is implemented."
+      ]
+    },
+    {
+      "id": "l2",
+      "name": "L2 authenticated link",
+      "type": "crypto",
+      "tileId": null,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/l2 (noc_l2_p7_pair)",
+      "geometry": {
+        "x": -4.9,
+        "z": 13.6,
+        "h": 0.85
+      },
+      "metrics": {
+        "lut": 6612,
+        "ff": 5921,
+        "bram": 0
+      },
+      "scenarioRefs": [
+        "attest",
+        "revoke"
+      ],
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-GATES"
+      ],
+      "interfaces": [
+        "NI 3",
+        "NI 4"
+      ],
+      "summary": "Authenticates control packets between tiles 3 and 4 only, so a forged or replayed control packet is rejected.",
+      "detail": [
+        "Each control packet carries a KMAC128 128-bit tag, an 80-bit epoch and a 64-bit sequence number.",
+        "One KMAC engine is shared through an arbiter.",
+        "Data packets (memory requests and responses) are not tagged."
+      ]
+    },
+    {
+      "id": "ver",
+      "name": "RoT verifier",
+      "type": "crypto",
+      "tileId": 4,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/verifier (pq_rot_verifier)",
+      "geometry": {
+        "x": 4.6,
+        "z": 13.2,
+        "h": 0.85
+      },
+      "metrics": {
+        "lut": 5807,
+        "ff": 4621,
+        "bram": 0
+      },
+      "scenarioRefs": [
+        "attest",
+        "revoke"
+      ],
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-GATES"
+      ],
+      "interfaces": [
+        "NI 4"
+      ],
+      "summary": "The root of trust. It sends a challenge to tile 3, checks the returned measurement and tag, and then grants or revokes access.",
+      "detail": [
+        "Issues CHALLENGE, GRANT and REVOKE.",
+        "Attestation starts once after reset and again when button 1 is pressed; button 2 revokes.",
+        "There is no periodic re-attestation timer in this build."
+      ]
+    },
+    {
+      "id": "quar",
+      "name": "Ingress quarantine",
+      "type": "untrusted",
+      "tileId": 5,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7/quarantine (noc_ingress_quarantine)",
+      "geometry": {
+        "x": 19,
+        "z": 10.6,
+        "w": 5,
+        "d": 1.6,
+        "h": 0.55
+      },
+      "geometryRule": "Fixed size; not to scale",
+      "metrics": {
+        "lut": 5,
+        "ff": 6,
+        "bram": 0
+      },
+      "scenarioRefs": [
+        "forged"
+      ],
+      "evidenceRefs": [
+        "E-UTIL",
+        "E-GATES"
+      ],
+      "summary": "Holds anything arriving from the untrusted port and rejects rogue packets before they can enter the network."
+    },
+    {
+      "id": "spoof",
+      "name": "SPOOF port",
+      "type": "untrusted",
+      "tileId": 5,
+      "parentId": "die",
+      "modulePath": "u_core/u_p7 spoof_raw_* (tied off in pq_soc_merged_core)",
+      "geometry": {
+        "x": 19,
+        "z": 14.2,
+        "w": 5,
+        "d": 3.4,
+        "h": 0.4
+      },
+      "geometryRule": "Fixed size; not to scale",
+      "maturity": "SIM_VERIFIED",
+      "confidence": "DERIVED",
+      "metrics": {
+        "note": "A port, not a block. Tied off in the board image."
+      },
+      "scenarioRefs": [
+        "forged"
+      ],
+      "evidenceRefs": [
+        "E-RTL-CORE",
+        "E-GATES"
+      ],
+      "summary": "An untrusted injection port used in simulation to send forged or replayed packets. In the board image it is tied off, so this attack is not part of the board demo."
+    },
+    {
+      "id": "mmcm",
+      "name": "MMCM clock generator",
+      "type": "clock",
+      "tileId": null,
+      "parentId": "die",
+      "modulePath": "u_mmcm (MMCME2 primitive)",
+      "geometry": {
+        "x": 26.6,
+        "z": 16.6,
+        "w": 3.4,
+        "d": 2.6,
+        "h": 0.5
+      },
+      "geometryRule": "Fixed size; not to scale",
+      "clockDomain": "input sys_clk_pin (100 MHz), output clk50_mmcm (50 MHz)",
+      "resetDomain": "none (its lock signal starts the design reset)",
+      "metrics": {
+        "note": "A device primitive, not LUT logic"
+      },
+      "evidenceRefs": [
+        "E-GATE",
+        "E-XDC"
+      ],
+      "summary": "Turns the board's 100 MHz clock into the single 50 MHz clock that the whole design uses."
+    }
+  ],
+  "edges": [
+    {
+      "a": "r0",
+      "b": "r1",
+      "kind": "mesh"
+    },
+    {
+      "a": "r1",
+      "b": "r2",
+      "kind": "mesh"
+    },
+    {
+      "a": "r3",
+      "b": "r4",
+      "kind": "mesh"
+    },
+    {
+      "a": "r4",
+      "b": "r5",
+      "kind": "mesh"
+    },
+    {
+      "a": "r0",
+      "b": "r3",
+      "kind": "mesh"
+    },
+    {
+      "a": "r1",
+      "b": "r4",
+      "kind": "mesh"
+    },
+    {
+      "a": "r2",
+      "b": "r5",
+      "kind": "mesh"
+    },
+    {
+      "a": "ni0",
+      "b": "r0",
+      "kind": "local"
+    },
+    {
+      "a": "ni1",
+      "b": "r1",
+      "kind": "local"
+    },
+    {
+      "a": "ni2",
+      "b": "r2",
+      "kind": "local"
+    },
+    {
+      "a": "ni3",
+      "b": "r3",
+      "kind": "local"
+    },
+    {
+      "a": "ni4",
+      "b": "r4",
+      "kind": "local"
+    },
+    {
+      "a": "ni5",
+      "b": "r5",
+      "kind": "local"
+    },
+    {
+      "a": "cpuB.bridge",
+      "b": "ni0",
+      "kind": "tile"
+    },
+    {
+      "a": "cpuB.core",
+      "b": "cpuB.bridge",
+      "kind": "tile"
+    },
+    {
+      "a": "ni2",
+      "b": "memfe",
+      "kind": "tile"
+    },
+    {
+      "a": "memfe",
+      "b": "bram",
+      "kind": "tile"
+    },
+    {
+      "a": "cpuA.bridge",
+      "b": "ni3",
+      "kind": "tile"
+    },
+    {
+      "a": "cpuA.core",
+      "b": "cpuA.bridge",
+      "kind": "tile"
+    },
+    {
+      "a": "cpuA.meas",
+      "b": "endp",
+      "kind": "tile"
+    },
+    {
+      "a": "endp",
+      "b": "ni3",
+      "kind": "tile"
+    },
+    {
+      "a": "ver",
+      "b": "ni4",
+      "kind": "tile"
+    },
+    {
+      "a": "l2",
+      "b": "ni3",
+      "kind": "tile"
+    },
+    {
+      "a": "l2",
+      "b": "ni4",
+      "kind": "tile"
+    },
+    {
+      "a": "spoof",
+      "b": "quar",
+      "kind": "tile"
+    },
+    {
+      "a": "quar",
+      "b": "r5",
+      "kind": "tile"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "note": "Development metadata. Never bundled when PUBLIC_SAFE is on (the default).",
+  "commit": "2792367f322b04f6e68e4bac7cb7894b6ff04c85",
+  "rtlTag": "rtl-rc1-20261112 (416379e1)",
+  "paths": {
+    "E-GATE": "NOC_PQATTEST.runs/impl_merged/gate/gate_summary.txt",
+    "E-UTIL": "NOC_PQATTEST.runs/impl_merged/gate/util_hier_routed.rpt",
+    "E-XDC": "synth/merged/pq_merged_board_arty.xdc",
+    "E-GATES": "reports/I13..I26_GATE_*.md",
+    "E-MATCHED": "reports/dual_lane_10_20261111_124233_d42406c3/i25_matched_data/matched_latency.json",
+    "E-BASE": "reports/I25_GATE_20261111.md",
+    "E-RTL-CORE": "rtl/dual_lane/merged/pq_soc_merged_core.sv",
+    "E-RTL-BRIDGE": "rtl/riscv/tmem_app_bridge.sv",
+    "E-RTL-SUBSYS": "rtl/dual_lane/pq_noc_subsystem_p7_i9.sv",
+    "E-CDC": "(scratch run on NOC_PQATTEST.runs/impl_merged/pq_merged_board_top_postroute_physopt.dcp)",
+    "E-HW": "reports/HARDWARE_RUN_20261107.md"
+  },
+  "images": {
+    "2026-11-12 17:35 owner GUI build": "2b2518be62ca03d5f9aa154e4a437a29419bac3ec9807044fa24d738256c2913",
+    "2026-11-12 14:05 release flow": "9dd6dca610e154aea5627bb621e58d53aa60d6b65fe6aca5ee8e991247e97000",
+    "2026-11-07 board demo image": "d738b12b994776d6ab183a9691d77113e2c5f15b4e7105a394a69378e14867e3"
+  }
+}

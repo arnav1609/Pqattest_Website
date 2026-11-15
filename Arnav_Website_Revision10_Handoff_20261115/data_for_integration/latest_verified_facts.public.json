@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "usage": "Reference dataset for integration; NOT a drop-in replacement for existing site/data schemas",
+  "build": {
+    "id": "R10-OWNER-GUI-20261115-1226",
+    "label": "Revision 10 - firmware v3 - owner GUI build, 15 November 2026",
+    "profile": 10,
+    "release_state": "Qualified FPGA build; final RC2 tag pending",
+    "maturity": "ROUTED",
+    "currency": "CURRENT_BUILD",
+    "tool": "Vivado 2024.1",
+    "part": "xc7a100tcsg324-1",
+    "board": "Arty A7-100T",
+    "top": "pq_merged_board_top",
+    "clock_mhz": 50,
+    "clock_period_ns": 20,
+    "board_input_clock_mhz": 100,
+    "lut": 39962,
+    "lut_capacity": 63400,
+    "lut_percent": 63.03,
+    "ff": 29187,
+    "bram36": 20,
+    "dsp": 0,
+    "wns_ns": 0.182,
+    "whs_ns": 0.007,
+    "tns_ns": 0,
+    "ths_ns": 0,
+    "route_errors": 0,
+    "drc_errors": 0,
+    "check_timing": "clean",
+    "implementation_errors": 0,
+    "implementation_critical_warnings": 0,
+    "implementation_warnings": 4,
+    "methodology_warnings": 11,
+    "methodology_advisories": 1
+  },
+  "status": {
+    "hardware_validated": false,
+    "formal_proof": false,
+    "soc_integration_complete": false,
+    "asic_started": false,
+    "rc2_tag_issued": false
+  },
+  "measurement": {
+    "attested_tile": 3,
+    "imem_bytes": 16384,
+    "imem_words": 4096,
+    "hash": "SHA3-256",
+    "field_bytes": 64,
+    "field_layout": [
+      {
+        "offset": 0,
+        "bytes": 32,
+        "value": "SHA3-256 of full IMEM"
+      },
+      {
+        "offset": 32,
+        "bytes": 4,
+        "value": "16384, little-endian"
+      },
+      {
+        "offset": 36,
+        "bytes": 4,
+        "value": "base address 0, little-endian"
+      },
+      {
+        "offset": 40,
+        "bytes": 24,
+        "value": "zeros"
+      }
+    ],
+    "outer_measurement": "SHA3-256(tile ID || 16-byte config || encoded 64-byte IMEM field)",
+    "rate_block_bytes": 136,
+    "nonfinal_blocks": 120,
+    "final_block_bytes": 64,
+    "boot_hash_cycles_approx": 8000,
+    "boot_hash_delay_ms_approx": 0.16,
+    "delay_is_estimate": true,
+    "mode": "Boot/request-driven, not continuous",
+    "cpu_tile_0": "Retains small window reader; output unused for authorization"
+  },
+  "firmware": {
+    "name": "demo_fw_v3",
+    "language": "RV32I assembly",
+    "padded_words": 4096,
+    "button_waits": "Revoke and re-attest waits have no firmware timeout; grant wait remains bounded"
+  },
+  "fetch_policy": {
+    "successful_local_instruction_fetches": "IMEM only",
+    "dmemory_and_mmio_fetches": "Refused through existing error/poison/IRQ semantics",
+    "ordinary_data_loads_stores": "Unchanged",
+    "remote_instruction_fetches": "Already refused by bridge",
+    "cfi_claim": false
+  },
+  "verification": {
+    "increment": "I-27-R2",
+    "accepted_jobs": 31,
+    "fresh_jobs": 31,
+    "reused_jobs": 0,
+    "scoped_mutation_kills": 7,
+    "original_i27": "Historical NOT PASSED; preserved test-sampling failure",
+    "full_project_gui_built": true,
+    "board_test": "Pending for this image",
+    "current_coverage_closure": "Not established; phase-0 coverage is historical baseline evidence"
+  },
+  "area_inclusive": {
+    "whole_design": {
+      "report_instance_chain": "pq_merged_board_top",
+      "depth": 0,
+      "instance": "pq_merged_board_top",
+      "module": "(top)",
+      "lut": 39962,
+      "logic_lut": 37864,
+      "lutram": 2098,
+      "srl": 0,
+      "ff": 29187,
+      "ramb36": 20,
+      "ramb18": 0,
+      "dsp": 0
+    },
+    "cpu_tile_3_including_hasher": {
+      "report_instance_chain": "pq_merged_board_top / u_core / u_cpu_a",
+      "depth": 2,
+      "instance": "u_cpu_a",
+      "module": "cpu_tile_noc",
+      "lut": 8117,
+      "logic_lut": 8023,
+      "lutram": 94,
+      "srl": 0,
+      "ff": 6622,
+      "ramb36": 8,
+      "ramb18": 0,
+      "dsp": 0
+    },
+    "cpu_tile_0": {
+      "report_instance_chain": "pq_merged_board_top / u_core / u_cpu_b",
+      "depth": 2,
+      "instance": "u_cpu_b",
+      "module": "cpu_tile_noc__parameterized0",
+      "lut": 2566,
+      "logic_lut": 2472,
+      "lutram": 94,
+      "srl": 0,
+      "ff": 1585,
+      "ramb36": 8,
+      "ramb18": 0,
+      "dsp": 0
+    },
+    "whole_imem_hasher_inside_cpu_tile_3": {
+      "report_instance_chain": "pq_merged_board_top / u_core / u_cpu_a / g_full.u_meas",
+      "depth": 3,
+      "instance": "g_full.u_meas",
+      "module": "meas_imem_hasher",
+      "lut": 5445,
+      "logic_lut": 5445,
+      "lutram": 0,
+      "srl": 0,
+      "ff": 4897,
+      "ramb36": 0,
+      "ramb18": 0,
+      "dsp": 0
+    },
+    "attestation_endpoint": {
+      "report_instance_chain": "pq_merged_board_top / u_core / u_p7 / endpoint",
+      "depth": 3,
+      "instance": "endpoint",
+      "module": "pq_attest_endpoint",
+      "lut": 6362,
+      "logic_lut": 6362,
+      "lutram": 0,
+      "srl": 0,
+      "ff": 8081,
+      "ramb36": 0,
+      "ramb18": 0,
+      "dsp": 0
+    },
+    "l2_authenticated_link": {
+      "report_instance_chain": "pq_merged_board_top / u_core / u_p7 / l2",
+      "depth": 3,
+      "instance": "l2",
+      "module": "noc_l2_p7_pair",
+      "lut": 6568,
+      "logic_lut": 6384,
+      "lutram": 184,
+      "srl": 0,
+      "ff": 5921,
+      "ramb36": 0,
+      "ramb18": 0,
+      "dsp": 0
+    },
+    "noc_mesh": {
+      "report_instance_chain": "pq_merged_board_top / u_core / u_p7 / mesh",
+      "depth": 3,
+      "instance": "mesh",
+      "module": "noc_mesh_3x2",
+      "lut": 10116,
+      "logic_lut": 8412,
+      "lutram": 1704,
+      "srl": 0,
+      "ff": 1916,
+      "ramb36": 0,
+      "ramb18": 0,
+      "dsp": 0
+    },
+    "root_of_trust_verifier": {
+      "report_instance_chain": "pq_merged_board_top / u_core / u_p7 / verifier",
+      "depth": 3,
+      "instance": "verifier",
+      "module": "pq_rot_verifier",
+      "lut": 5802,
+      "logic_lut": 5802,
+      "lutram": 0,
+      "srl": 0,
+      "ff": 4621,
+      "ramb36": 0,
+      "ramb18": 0,
+      "dsp": 0
+    }
+  }
+}

@@ -1,0 +1,400 @@
+{
+  "mode": "EXPLANATORY_WALKTHROUGH",
+  "modeNote": "Explanatory walkthrough: the order, routes and outcomes follow the RTL, but the timing is not cycle-accurate and no simulation trace is replayed.",
+  "vc": {
+    "vc0": {
+      "name": "VC0",
+      "carries": "memory requests",
+      "shape": "rectangular flits, solid line"
+    },
+    "vc1": {
+      "name": "VC1",
+      "carries": "memory responses",
+      "shape": "rounded flits, long-dash line"
+    },
+    "vc2": {
+      "name": "VC2",
+      "carries": "attestation control",
+      "shape": "diamond flits, short-dash line"
+    },
+    "local": {
+      "name": "Local",
+      "carries": "signals inside one tile, not on the network",
+      "shape": "small flits, dotted line"
+    }
+  },
+  "scenarios": [
+    {
+      "id": "boot",
+      "name": "Boot and measure",
+      "where": "Board design; behaviour checked in simulation",
+      "summary": "Both processors start the demo firmware. Tile 3's instruction memory is sampled so that it can be measured.",
+      "authStart": false,
+      "evidenceRefs": [
+        "E-RTL-CORE",
+        "E-GATES"
+      ],
+      "events": [
+        {
+          "id": "boot-1",
+          "label": "Measurement window",
+          "path": [
+            "cpuA.meas",
+            "endp"
+          ],
+          "vc": "local",
+          "outcome": "accepted",
+          "what": "The first 64 bytes of tile 3's instruction memory go to the PQ-Attest endpoint.",
+          "why": "They are hashed with SHA3-256, together with the tile ID and configuration, to form the tile's measurement.",
+          "focus": [
+            "cpuA",
+            "cpuB",
+            "endp"
+          ],
+          "actor": "cpuA",
+          "who": "Tile 3 · CPU A",
+          "plain": "Tile 3’s firmware is read so that it can be measured.",
+          "matters": "The measurement is a fingerprint of the code: changed firmware gives a different fingerprint."
+        }
+      ]
+    },
+    {
+      "id": "attest",
+      "name": "Attest tile 3",
+      "where": "Board design; behaviour checked in simulation",
+      "summary": "The root of trust on tile 4 challenges tile 3, checks the answer and grants access. Tiles 4 and 3 are one hop apart.",
+      "authStart": false,
+      "evidenceRefs": [
+        "E-GATES",
+        "E-RTL-SUBSYS"
+      ],
+      "events": [
+        {
+          "id": "att-1",
+          "label": "CHALLENGE",
+          "path": [
+            "ver",
+            "ni4",
+            "r4",
+            "r3",
+            "ni3",
+            "endp"
+          ],
+          "vc": "vc2",
+          "outcome": "accepted",
+          "what": "The verifier sends a fresh 224-bit challenge to tile 3.",
+          "why": "A fresh value stops an old answer from being replayed. The packet is authenticated by the L2 link.",
+          "focus": [
+            "ver",
+            "l2"
+          ],
+          "actor": "ver",
+          "who": "Tile 4 · Root of trust",
+          "plain": "The root of trust challenges tile 3 to prove it can be trusted.",
+          "matters": "A fresh challenge each time means an old answer cannot be replayed."
+        },
+        {
+          "id": "att-2",
+          "label": "RESPONSE",
+          "path": [
+            "endp",
+            "ni3",
+            "r3",
+            "r4",
+            "ni4",
+            "ver"
+          ],
+          "vc": "vc2",
+          "outcome": "accepted",
+          "what": "Tile 3 returns its measurement and a KMAC128 tag (512-bit payload).",
+          "why": "Only a tile holding the right key and running the expected firmware can produce a tag the verifier accepts.",
+          "focus": [
+            "endp",
+            "l2",
+            "ver"
+          ],
+          "actor": "endp",
+          "who": "Tile 3 · CPU A",
+          "plain": "Tile 3 answers with its firmware fingerprint, sealed with a secret key.",
+          "matters": "Only genuine hardware running the expected firmware can give a correct answer."
+        },
+        {
+          "id": "att-3",
+          "label": "GRANT",
+          "path": [
+            "ver",
+            "ni4",
+            "r4",
+            "r3",
+            "ni3",
+            "endp"
+          ],
+          "vc": "vc2",
+          "outcome": "accepted",
+          "authAfter": true,
+          "what": "The verifier accepts the answer and sends GRANT.",
+          "why": "From now on tile 3 is authorized to use the shared memory.",
+          "focus": [
+            "ver",
+            "l2",
+            "cpuA"
+          ],
+          "actor": "ver",
+          "who": "Tile 4 · Root of trust",
+          "plain": "The answer is correct, so the root of trust grants tile 3 access.",
+          "matters": "Until now tile 3 could not use the shared memory at all."
+        }
+      ]
+    },
+    {
+      "id": "access",
+      "name": "Authorized memory access",
+      "where": "Board design; behaviour and latency measured in simulation",
+      "summary": "Tile 3 writes a value to the shared memory on tile 2 and reads it back over the network.",
+      "authStart": true,
+      "evidenceRefs": [
+        "E-MATCHED",
+        "E-GATES"
+      ],
+      "events": [
+        {
+          "id": "acc-1",
+          "label": "Write request",
+          "path": [
+            "cpuA.bridge",
+            "ni3",
+            "r3",
+            "r4",
+            "r5",
+            "r2",
+            "ni2",
+            "memfe",
+            "bram"
+          ],
+          "vc": "vc0",
+          "outcome": "accepted",
+          "memoryAction": "write 0xC0DE5A5A",
+          "what": "CPU A writes 0xC0DE5A5A. The request travels 3 to 4 to 5 to 2.",
+          "why": "XY routing goes along X first, then Y. The memory front end checks that tile 3 is authorized before the write happens.",
+          "focus": [
+            "cpuA",
+            "memfe",
+            "bram"
+          ],
+          "actor": "cpuA",
+          "who": "Tile 3 · CPU A",
+          "plain": "Tile 3 writes the value 0xC0DE5A5A into the shared memory on tile 2.",
+          "matters": "The memory checks the sender’s permission at the moment of the write."
+        },
+        {
+          "id": "acc-2",
+          "label": "Write response",
+          "path": [
+            "memfe",
+            "ni2",
+            "r2",
+            "r1",
+            "r0",
+            "r3",
+            "ni3",
+            "cpuA.bridge"
+          ],
+          "vc": "vc1",
+          "outcome": "accepted",
+          "what": "The acknowledgement returns 2 to 1 to 0 to 3.",
+          "why": "Responses use their own virtual channel, so they cannot be blocked behind requests.",
+          "focus": [
+            "memfe",
+            "cpuA"
+          ],
+          "actor": "memfe",
+          "who": "Tile 2 · Shared memory",
+          "plain": "The memory confirms the write.",
+          "matters": "Replies travel on their own channel, so they never queue behind requests."
+        },
+        {
+          "id": "acc-3",
+          "label": "Read request",
+          "path": [
+            "cpuA.bridge",
+            "ni3",
+            "r3",
+            "r4",
+            "r5",
+            "r2",
+            "ni2",
+            "memfe",
+            "bram"
+          ],
+          "vc": "vc0",
+          "outcome": "accepted",
+          "memoryAction": "read",
+          "what": "CPU A asks for the same address.",
+          "why": "Authorization is checked again for this access.",
+          "focus": [
+            "cpuA",
+            "memfe",
+            "bram"
+          ],
+          "actor": "cpuA",
+          "who": "Tile 3 · CPU A",
+          "plain": "Tile 3 asks to read the same address.",
+          "matters": "Permission is checked again on every access, not just once."
+        },
+        {
+          "id": "acc-4",
+          "label": "Read response",
+          "path": [
+            "bram",
+            "memfe",
+            "ni2",
+            "r2",
+            "r1",
+            "r0",
+            "r3",
+            "ni3",
+            "cpuA.bridge"
+          ],
+          "vc": "vc1",
+          "outcome": "accepted",
+          "uart": "T3 PASS",
+          "led": "0001",
+          "what": "The stored value comes back and matches.",
+          "why": "The firmware reports success on the UART and the LEDs.",
+          "focus": [
+            "bram",
+            "cpuA"
+          ],
+          "actor": "bram",
+          "who": "Tile 2 · Shared memory",
+          "plain": "The value comes back and matches. Tile 3 prints “T3 PASS”.",
+          "matters": "The trusted path works end to end."
+        }
+      ]
+    },
+    {
+      "id": "refuse",
+      "name": "Refused tile",
+      "where": "Board design; behaviour checked in simulation",
+      "summary": "Tile 0 tries the same write. It was never authorized.",
+      "authStart": true,
+      "evidenceRefs": [
+        "E-RTL-BRIDGE",
+        "E-GATES"
+      ],
+      "events": [
+        {
+          "id": "ref-1",
+          "label": "Local refusal",
+          "path": [
+            "cpuB.core",
+            "cpuB.bridge"
+          ],
+          "vc": "local",
+          "outcome": "refused",
+          "uart": "T0 REFUSED",
+          "led": "0010",
+          "what": "CPU B's request stops at its own bridge.",
+          "why": "The bridge never raises a network request while the tile is not authorized, so no packet enters the mesh. The processor gets a poison value.",
+          "focus": [
+            "cpuB"
+          ],
+          "actor": "cpuB",
+          "who": "Tile 0 · CPU B",
+          "plain": "Tile 0 tries the same write and is stopped inside its own tile.",
+          "matters": "An untrusted tile never gets a single packet onto the network."
+        }
+      ]
+    },
+    {
+      "id": "revoke",
+      "name": "Revoke",
+      "where": "Board design; behaviour checked in simulation",
+      "summary": "Button 2 makes the root of trust revoke tile 3. Button 1 would attest it again.",
+      "authStart": true,
+      "evidenceRefs": [
+        "E-RTL-BRIDGE",
+        "E-GATES"
+      ],
+      "events": [
+        {
+          "id": "rev-1",
+          "label": "REVOKE",
+          "path": [
+            "ver",
+            "ni4",
+            "r4",
+            "r3",
+            "ni3",
+            "endp"
+          ],
+          "vc": "vc2",
+          "outcome": "accepted",
+          "authAfter": false,
+          "what": "The verifier sends REVOKE to tile 3.",
+          "why": "Tile 3 loses its authorization at once.",
+          "focus": [
+            "ver",
+            "l2"
+          ],
+          "actor": "ver",
+          "who": "Tile 4 · Root of trust",
+          "plain": "Button 2 is pressed and the root of trust revokes tile 3’s access.",
+          "matters": "Trust can be taken away while the chip runs, not only at power-on."
+        },
+        {
+          "id": "rev-2",
+          "label": "Refused request",
+          "path": [
+            "cpuA.core",
+            "cpuA.bridge"
+          ],
+          "vc": "local",
+          "outcome": "refused",
+          "what": "CPU A's next memory request stops at its own bridge.",
+          "why": "With authorization gone, the bridge refuses locally, exactly as tile 0's does.",
+          "focus": [
+            "cpuA"
+          ],
+          "actor": "cpuA",
+          "who": "Tile 3 · CPU A",
+          "plain": "Tile 3’s next request is now stopped inside its own tile.",
+          "matters": "Once revoked, tile 3 is treated like any untrusted tile."
+        }
+      ]
+    },
+    {
+      "id": "forged",
+      "name": "Forged packet",
+      "where": "Simulation only: the SPOOF port is tied off in the board image",
+      "summary": "An attack test: the untrusted port injects a forged or replayed packet.",
+      "authStart": false,
+      "evidenceRefs": [
+        "E-GATES",
+        "E-RTL-CORE"
+      ],
+      "events": [
+        {
+          "id": "for-1",
+          "label": "Rejected at quarantine",
+          "path": [
+            "spoof",
+            "quar"
+          ],
+          "vc": "vc2",
+          "outcome": "rejected",
+          "what": "The forged packet reaches the ingress quarantine and is rejected.",
+          "why": "Packets from the untrusted port are held and checked first; forged control packets also fail the L2 tag and sequence check.",
+          "focus": [
+            "spoof",
+            "quar"
+          ],
+          "actor": "spoof",
+          "who": "Tile 5 · Untrusted port",
+          "plain": "A forged packet is injected and rejected by the quarantine. This runs in simulation only.",
+          "matters": "Fake security messages cannot get into the network."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "gui_whole_sha256": "f633b14c02173066fc38689bd5b4e7cdcda53e3a63e473ccfe5b4a295f6a52a2",
+  "gui_header": {
+    "a": "pq_merged_board_top;UserID=0XFFFFFFFF;Version=2024.1",
+    "b": "7a100tcsg324",
+    "c": "2026/11/14",
+    "d": "22:04:02"
+  },
+  "payload_bytes": 3825788,
+  "payload_sha256": "54228bfc7b7536a48cb27e1538574199d7088fd4ff2f849664d141317204c3dd",
+  "matches_both_g4_payloads": true
+}

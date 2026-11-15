@@ -1,0 +1,27 @@
+{
+  "name": "pq-attest-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "validate:data": "node scripts/validate-data.mjs",
+    "build": "node scripts/validate-data.mjs && tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "build:single": "node scripts/make-artifact.mjs && node scripts/check-single.mjs",
+    "manifest": "node scripts/make-manifest.mjs",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.1.0",
+    "@fontsource/ibm-plex-sans": "5.1.0",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.1",
+    "@playwright/test": "1.49.0",
+    "@types/three": "0.170.0",
+    "typescript": "5.6.3",
+    "vite": "5.4.11"
+  }
+}

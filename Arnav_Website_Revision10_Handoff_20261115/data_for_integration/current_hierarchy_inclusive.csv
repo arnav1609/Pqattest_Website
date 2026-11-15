@@ -1,0 +1,326 @@
+report_instance_chain,depth,instance,module,lut,logic_lut,lutram,srl,ff,ramb36,ramb18,dsp
+pq_merged_board_top,0,pq_merged_board_top,(top),39962,37864,2098,0,29187,20,0,0
+pq_merged_board_top / u_core,1,u_core,pq_soc_merged_core,39931,37833,2098,0,29016,20,0,0
+pq_merged_board_top / u_core / u_bram,2,u_bram,tile2_bram_infer,0,0,0,0,0,4,0,0
+pq_merged_board_top / u_core / u_cpu_a,2,u_cpu_a,cpu_tile_noc,8117,8023,94,0,6622,8,0,0
+pq_merged_board_top / u_core / u_cpu_a / g_full.u_meas,3,g_full.u_meas,meas_imem_hasher,5445,5445,0,0,4897,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / g_full.u_meas / u_sha3,4,u_sha3,sha3_256,5429,5429,0,0,3516,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / g_full.u_meas / u_sha3 / u_keccak_f1600,5,u_keccak_f1600,keccak_f1600_21,4611,4611,0,0,1658,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / g_full.u_meas / u_sha3 / u_keccak_f1600 / u_keccak_round,6,u_keccak_round,keccak_round_22,1172,1172,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_bridge,3,u_bridge,tmem_app_bridge,72,72,0,0,167,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_mem,3,u_mem,tile_mem_wrapper_9,23,23,0,0,2,8,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_mem / dmem_inst,4,dmem_inst,mem_bram__parameterized0_19,1,1,0,0,1,4,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_mem / imem_inst,4,imem_inst,mem_bram_20,22,22,0,0,1,4,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile,3,u_tile,tile_top,2578,2484,94,0,1553,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / adapter_inst,4,adapter_inst,picorv32_adapter_10,346,346,0,0,139,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / addr_decode_inst,4,addr_decode_inst,addr_decode_11,241,241,0,0,103,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / cpu,4,cpu,picorv32_12,1946,1858,88,0,1163,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / cpu / pcpi_div,5,pcpi_div,picorv32_pcpi_div_17,281,281,0,0,200,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / cpu / pcpi_mul,5,pcpi_mul,picorv32_pcpi_mul_18,250,250,0,0,255,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / gen_uart.uart_mmio_inst,4,gen_uart.uart_mmio_inst,uart_mmio_13,43,37,6,0,49,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / gen_uart.uart_mmio_inst / uart_tx_inst,5,uart_tx_inst,uart_tx_16,42,36,6,0,45,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / gpio_inst,4,gpio_inst,gpio_14,1,1,0,0,10,0,0,0
+pq_merged_board_top / u_core / u_cpu_a / u_tile / tile_status_inst,4,tile_status_inst,tile_status_15,4,4,0,0,71,0,0,0
+pq_merged_board_top / u_core / u_cpu_b,2,u_cpu_b,cpu_tile_noc__parameterized0,2566,2472,94,0,1585,8,0,0
+pq_merged_board_top / u_core / u_cpu_b / g_window.u_meas,3,g_window.u_meas,meas_window_reader,7,7,0,0,11,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_bridge,3,u_bridge,tmem_app_bridge__parameterized0,3,3,0,0,20,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_mem,3,u_mem,tile_mem_wrapper,29,29,0,0,2,8,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_mem / dmem_inst,4,dmem_inst,mem_bram__parameterized0,0,0,0,0,1,4,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_mem / imem_inst,4,imem_inst,mem_bram,29,29,0,0,1,4,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile,3,u_tile,tile_top__parameterized0,2527,2433,94,0,1551,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / adapter_inst,4,adapter_inst,picorv32_adapter,315,315,0,0,139,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / addr_decode_inst,4,addr_decode_inst,addr_decode,232,232,0,0,103,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / cpu,4,cpu,picorv32,1935,1847,88,0,1163,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / cpu / pcpi_div,5,pcpi_div,picorv32_pcpi_div,279,279,0,0,200,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / cpu / pcpi_mul,5,pcpi_mul,picorv32_pcpi_mul,247,247,0,0,255,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / gen_uart.uart_mmio_inst,4,gen_uart.uart_mmio_inst,uart_mmio,44,38,6,0,49,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / gen_uart.uart_mmio_inst / uart_tx_inst,5,uart_tx_inst,uart_tx,44,38,6,0,45,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / gpio_inst,4,gpio_inst,gpio,2,2,0,0,10,0,0,0
+pq_merged_board_top / u_core / u_cpu_b / u_tile / tile_status_inst,4,tile_status_inst,tile_status,1,1,0,0,69,0,0,0
+pq_merged_board_top / u_core / u_p7,2,u_p7,pq_noc_subsystem_p7,29249,27339,1910,0,20807,0,0,0
+pq_merged_board_top / u_core / u_p7 / GN[0].PLAIN.ni,3,GN[0].PLAIN.ni,noc_network_interface_p7,28,28,0,0,18,0,0,0
+pq_merged_board_top / u_core / u_p7 / GN[1].PLAIN.ni,3,GN[1].PLAIN.ni,noc_network_interface_p7__parameterized0,32,32,0,0,18,0,0,0
+pq_merged_board_top / u_core / u_p7 / GN[2].PLAIN.ni,3,GN[2].PLAIN.ni,noc_network_interface_p7__parameterized1,275,253,22,0,103,0,0,0
+pq_merged_board_top / u_core / u_p7 / GN[3].gate,3,GN[3].gate,noc_attest_gate__parameterized2,4,4,0,0,1,0,0,0
+pq_merged_board_top / u_core / u_p7 / GN[4].gate,3,GN[4].gate,noc_attest_gate__parameterized3,0,0,0,0,1,0,0,0
+pq_merged_board_top / u_core / u_p7 / GN[5].PLAIN.ni,3,GN[5].PLAIN.ni,noc_network_interface_p7__parameterized2,32,32,0,0,18,0,0,0
+pq_merged_board_top / u_core / u_p7 / IG[2].parser,3,IG[2].parser,noc_ingress_parser__parameterized1,4,4,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / IG[3].parser,3,IG[3].parser,noc_ingress_parser__parameterized2,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / IG[4].parser,3,IG[4].parser,noc_ingress_parser__parameterized3,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint,3,endpoint,pq_attest_endpoint,6362,6362,0,0,8081,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller,4,controller,pq_attestation_controller,6281,6281,0,0,7612,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_perm,5,u_perm,keccak_f1600_3,3607,3607,0,0,1658,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_perm / u_keccak_round,6,u_keccak_round,keccak_round_7,1186,1186,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_pq_attestation_tag,5,u_pq_attestation_tag,pq_attestation_tag_xk_4,323,323,0,0,984,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_pq_kdf,5,u_pq_kdf,pq_kdf_xk_5,114,114,0,0,349,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_pq_kmac_share,5,u_pq_kmac_share,pq_kmac_share_xp,1207,1207,0,0,1727,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_pq_kmac_share / u_kmac,6,u_kmac,kmac128_xp,1207,1207,0,0,1727,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_pq_measurement,5,u_pq_measurement,pq_measurement_xp,874,874,0,0,1904,0,0,0
+pq_merged_board_top / u_core / u_p7 / endpoint / controller / u_pq_measurement / u_sha3,6,u_sha3,sha3_256_xp,365,365,0,0,258,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2,3,l2,noc_l2_p7_pair,6568,6384,184,0,5921,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / W[0].l2,4,W[0].l2,noc_l2_auth_p7,868,776,92,0,1032,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / W[0].l2 / ni,5,ni,noc_network_interface_p7__parameterized3,425,403,22,0,249,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / W[1].l2,4,W[1].l2,noc_l2_auth_p7__parameterized0,770,678,92,0,937,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / W[1].l2 / ni,5,ni,noc_network_interface_p7__parameterized4,277,255,22,0,181,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / engine,4,engine,l2_kmac_engine,4931,4931,0,0,3952,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / engine / arb,5,arb,l2_arbiter,6,6,0,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / engine / kmac,5,kmac,kmac128,4669,4669,0,0,3221,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / engine / kmac / u_keccak,6,u_keccak,keccak_f1600_0,3066,3066,0,0,1658,0,0,0
+pq_merged_board_top / u_core / u_p7 / l2 / engine / kmac / u_kmac_encode,6,u_kmac_encode,kmac_encode,789,789,0,0,718,0,0,0
+pq_merged_board_top / u_core / u_p7 / merge5,3,merge5,noc_ingress_merge2,1,1,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh,3,mesh,noc_mesh_3x2,10116,8412,1704,0,1916,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r,4,GEN_R[0].r,noc_router,1533,1277,256,0,225,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator,5,u_allocator,NOC_ALLOCATOR,548,548,0,0,50,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_ARB[0].u_arbiter,6,GEN_ARB[0].u_arbiter,NOC_ARBITER__parameterized0__1,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_ARB[1].u_arbiter,6,GEN_ARB[1].u_arbiter,NOC_ARBITER__parameterized0__2,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_ARB[2].u_arbiter,6,GEN_ARB[2].u_arbiter,NOC_ARBITER__parameterized0__3,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_ARB[3].u_arbiter,6,GEN_ARB[3].u_arbiter,NOC_ARBITER__parameterized0__4,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_ARB[4].u_arbiter,6,GEN_ARB[4].u_arbiter,NOC_ARBITER__parameterized0,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_IN_ARB[0].u_in_arbiter,6,GEN_IN_ARB[0].u_in_arbiter,NOC_ARBITER__1,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_IN_ARB[1].u_in_arbiter,6,GEN_IN_ARB[1].u_in_arbiter,NOC_ARBITER__2,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_IN_ARB[2].u_in_arbiter,6,GEN_IN_ARB[2].u_in_arbiter,NOC_ARBITER__3,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_IN_ARB[3].u_in_arbiter,6,GEN_IN_ARB[3].u_in_arbiter,NOC_ARBITER__4,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_IN_ARB[4].u_in_arbiter,6,GEN_IN_ARB[4].u_in_arbiter,NOC_ARBITER,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[12].u_xy_routing,6,GEN_XY[12].u_xy_routing,noc_xy_routing__13,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[13].u_xy_routing,6,GEN_XY[13].u_xy_routing,noc_xy_routing__14,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[14].u_xy_routing,6,GEN_XY[14].u_xy_routing,noc_xy_routing,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[3].u_xy_routing,6,GEN_XY[3].u_xy_routing,noc_xy_routing__4,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[4].u_xy_routing,6,GEN_XY[4].u_xy_routing,noc_xy_routing__5,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[5].u_xy_routing,6,GEN_XY[5].u_xy_routing,noc_xy_routing__6,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[6].u_xy_routing,6,GEN_XY[6].u_xy_routing,noc_xy_routing__7,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[7].u_xy_routing,6,GEN_XY[7].u_xy_routing,noc_xy_routing__8,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_allocator / GEN_XY[8].u_xy_routing,6,GEN_XY[8].u_xy_routing,noc_xy_routing__9,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_credit_control,5,u_credit_control,noc_credit_control,152,152,0,0,45,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_crossbar,5,u_crossbar,noc_crossbar,108,108,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath,5,u_datapath,noc_router_datapath,594,360,234,0,87,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / east_vc0_fifo,6,east_vc0_fifo,noc_fifo__7,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / east_vc1_fifo,6,east_vc1_fifo,noc_fifo__8,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / east_vc2_fifo,6,east_vc2_fifo,noc_fifo__9,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / local_vc0_fifo,6,local_vc0_fifo,noc_fifo__13,50,24,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / local_vc1_fifo,6,local_vc1_fifo,noc_fifo__14,51,25,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / local_vc2_fifo,6,local_vc2_fifo,noc_fifo,50,24,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / north_vc0_fifo,6,north_vc0_fifo,noc_fifo__1,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / north_vc1_fifo,6,north_vc1_fifo,noc_fifo__2,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / north_vc2_fifo,6,north_vc2_fifo,noc_fifo__3,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / south_vc0_fifo,6,south_vc0_fifo,noc_fifo__4,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / south_vc1_fifo,6,south_vc1_fifo,noc_fifo__5,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / south_vc2_fifo,6,south_vc2_fifo,noc_fifo__6,52,26,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / west_vc0_fifo,6,west_vc0_fifo,noc_fifo__10,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / west_vc1_fifo,6,west_vc1_fifo,noc_fifo__11,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_datapath / west_vc2_fifo,6,west_vc2_fifo,noc_fifo__12,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[0].r / u_eject_fifo,5,u_eject_fifo,noc_fifo__parameterized0,51,29,22,0,12,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r,4,GEN_R[1].r,noc_router__1,1942,1608,334,0,240,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator,5,u_allocator,NOC_ALLOCATOR__1,574,574,0,0,50,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_ARB[0].u_arbiter,6,GEN_ARB[0].u_arbiter,NOC_ARBITER__parameterized0__9,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_ARB[1].u_arbiter,6,GEN_ARB[1].u_arbiter,NOC_ARBITER__parameterized0__8,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_ARB[2].u_arbiter,6,GEN_ARB[2].u_arbiter,NOC_ARBITER__parameterized0__7,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_ARB[3].u_arbiter,6,GEN_ARB[3].u_arbiter,NOC_ARBITER__parameterized0__6,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_ARB[4].u_arbiter,6,GEN_ARB[4].u_arbiter,NOC_ARBITER__parameterized0__5,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_IN_ARB[0].u_in_arbiter,6,GEN_IN_ARB[0].u_in_arbiter,NOC_ARBITER__9,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_IN_ARB[1].u_in_arbiter,6,GEN_IN_ARB[1].u_in_arbiter,NOC_ARBITER__8,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_IN_ARB[2].u_in_arbiter,6,GEN_IN_ARB[2].u_in_arbiter,NOC_ARBITER__7,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_IN_ARB[3].u_in_arbiter,6,GEN_IN_ARB[3].u_in_arbiter,NOC_ARBITER__6,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_IN_ARB[4].u_in_arbiter,6,GEN_IN_ARB[4].u_in_arbiter,NOC_ARBITER__5,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[10].u_xy_routing,6,GEN_XY[10].u_xy_routing,noc_xy_routing__19,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[11].u_xy_routing,6,GEN_XY[11].u_xy_routing,noc_xy_routing__18,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[12].u_xy_routing,6,GEN_XY[12].u_xy_routing,noc_xy_routing__17,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[13].u_xy_routing,6,GEN_XY[13].u_xy_routing,noc_xy_routing__16,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[14].u_xy_routing,6,GEN_XY[14].u_xy_routing,noc_xy_routing__15,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[3].u_xy_routing,6,GEN_XY[3].u_xy_routing,noc_xy_routing__26,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[4].u_xy_routing,6,GEN_XY[4].u_xy_routing,noc_xy_routing__25,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[5].u_xy_routing,6,GEN_XY[5].u_xy_routing,noc_xy_routing__24,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[6].u_xy_routing,6,GEN_XY[6].u_xy_routing,noc_xy_routing__23,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[7].u_xy_routing,6,GEN_XY[7].u_xy_routing,noc_xy_routing__22,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[8].u_xy_routing,6,GEN_XY[8].u_xy_routing,noc_xy_routing__21,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_allocator / GEN_XY[9].u_xy_routing,6,GEN_XY[9].u_xy_routing,noc_xy_routing__20,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_credit_control,5,u_credit_control,noc_credit_control__1,153,153,0,0,45,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_crossbar,5,u_crossbar,noc_crossbar__1,284,284,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath,5,u_datapath,noc_router_datapath__1,796,484,312,0,102,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / east_vc0_fifo,6,east_vc0_fifo,noc_fifo__23,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / east_vc1_fifo,6,east_vc1_fifo,noc_fifo__22,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / east_vc2_fifo,6,east_vc2_fifo,noc_fifo__21,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / local_vc0_fifo,6,local_vc0_fifo,noc_fifo__17,51,25,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / local_vc1_fifo,6,local_vc1_fifo,noc_fifo__16,50,24,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / local_vc2_fifo,6,local_vc2_fifo,noc_fifo__15,51,25,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / north_vc0_fifo,6,north_vc0_fifo,noc_fifo__29,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / north_vc1_fifo,6,north_vc1_fifo,noc_fifo__28,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / north_vc2_fifo,6,north_vc2_fifo,noc_fifo__27,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / south_vc0_fifo,6,south_vc0_fifo,noc_fifo__26,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / south_vc1_fifo,6,south_vc1_fifo,noc_fifo__25,55,29,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / south_vc2_fifo,6,south_vc2_fifo,noc_fifo__24,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / west_vc0_fifo,6,west_vc0_fifo,noc_fifo__20,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / west_vc1_fifo,6,west_vc1_fifo,noc_fifo__19,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_datapath / west_vc2_fifo,6,west_vc2_fifo,noc_fifo__18,55,29,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[1].r / u_eject_fifo,5,u_eject_fifo,noc_fifo__parameterized0__1,51,29,22,0,12,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r,4,GEN_R[2].r,noc_router__2,1577,1317,260,0,231,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator,5,u_allocator,NOC_ALLOCATOR__2,560,560,0,0,50,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_ARB[0].u_arbiter,6,GEN_ARB[0].u_arbiter,NOC_ARBITER__parameterized0__14,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_ARB[1].u_arbiter,6,GEN_ARB[1].u_arbiter,NOC_ARBITER__parameterized0__13,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_ARB[2].u_arbiter,6,GEN_ARB[2].u_arbiter,NOC_ARBITER__parameterized0__12,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_ARB[3].u_arbiter,6,GEN_ARB[3].u_arbiter,NOC_ARBITER__parameterized0__11,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_ARB[4].u_arbiter,6,GEN_ARB[4].u_arbiter,NOC_ARBITER__parameterized0__10,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_IN_ARB[0].u_in_arbiter,6,GEN_IN_ARB[0].u_in_arbiter,NOC_ARBITER__14,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_IN_ARB[1].u_in_arbiter,6,GEN_IN_ARB[1].u_in_arbiter,NOC_ARBITER__13,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_IN_ARB[2].u_in_arbiter,6,GEN_IN_ARB[2].u_in_arbiter,NOC_ARBITER__12,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_IN_ARB[3].u_in_arbiter,6,GEN_IN_ARB[3].u_in_arbiter,NOC_ARBITER__11,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_IN_ARB[4].u_in_arbiter,6,GEN_IN_ARB[4].u_in_arbiter,NOC_ARBITER__10,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[10].u_xy_routing,6,GEN_XY[10].u_xy_routing,noc_xy_routing__34,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[11].u_xy_routing,6,GEN_XY[11].u_xy_routing,noc_xy_routing__33,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[12].u_xy_routing,6,GEN_XY[12].u_xy_routing,noc_xy_routing__32,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[13].u_xy_routing,6,GEN_XY[13].u_xy_routing,noc_xy_routing__31,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[14].u_xy_routing,6,GEN_XY[14].u_xy_routing,noc_xy_routing__30,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[3].u_xy_routing,6,GEN_XY[3].u_xy_routing,noc_xy_routing__41,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[4].u_xy_routing,6,GEN_XY[4].u_xy_routing,noc_xy_routing__40,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[5].u_xy_routing,6,GEN_XY[5].u_xy_routing,noc_xy_routing__39,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_allocator / GEN_XY[9].u_xy_routing,6,GEN_XY[9].u_xy_routing,noc_xy_routing__35,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_credit_control,5,u_credit_control,noc_credit_control__2,148,148,0,0,45,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_crossbar,5,u_crossbar,noc_crossbar__2,114,114,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath,5,u_datapath,noc_router_datapath__2,600,366,234,0,87,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / east_vc0_fifo,6,east_vc0_fifo,noc_fifo__38,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / east_vc1_fifo,6,east_vc1_fifo,noc_fifo__37,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / east_vc2_fifo,6,east_vc2_fifo,noc_fifo__36,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / local_vc0_fifo,6,local_vc0_fifo,noc_fifo__32,52,26,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / local_vc1_fifo,6,local_vc1_fifo,noc_fifo__31,54,28,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / local_vc2_fifo,6,local_vc2_fifo,noc_fifo__30,51,25,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / north_vc0_fifo,6,north_vc0_fifo,noc_fifo__44,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / north_vc1_fifo,6,north_vc1_fifo,noc_fifo__43,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / north_vc2_fifo,6,north_vc2_fifo,noc_fifo__42,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / south_vc0_fifo,6,south_vc0_fifo,noc_fifo__41,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / south_vc1_fifo,6,south_vc1_fifo,noc_fifo__40,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / south_vc2_fifo,6,south_vc2_fifo,noc_fifo__39,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / west_vc0_fifo,6,west_vc0_fifo,noc_fifo__35,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / west_vc1_fifo,6,west_vc1_fifo,noc_fifo__34,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_datapath / west_vc2_fifo,6,west_vc2_fifo,noc_fifo__33,53,27,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[2].r / u_eject_fifo,5,u_eject_fifo,noc_fifo__parameterized0__2,72,46,26,0,12,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r,4,GEN_R[3].r,noc_router__3,1605,1345,260,0,231,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator,5,u_allocator,NOC_ALLOCATOR__3,552,552,0,0,50,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_ARB[0].u_arbiter,6,GEN_ARB[0].u_arbiter,NOC_ARBITER__parameterized0__19,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_ARB[1].u_arbiter,6,GEN_ARB[1].u_arbiter,NOC_ARBITER__parameterized0__18,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_ARB[2].u_arbiter,6,GEN_ARB[2].u_arbiter,NOC_ARBITER__parameterized0__17,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_ARB[3].u_arbiter,6,GEN_ARB[3].u_arbiter,NOC_ARBITER__parameterized0__16,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_ARB[4].u_arbiter,6,GEN_ARB[4].u_arbiter,NOC_ARBITER__parameterized0__15,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_IN_ARB[0].u_in_arbiter,6,GEN_IN_ARB[0].u_in_arbiter,NOC_ARBITER__19,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_IN_ARB[1].u_in_arbiter,6,GEN_IN_ARB[1].u_in_arbiter,NOC_ARBITER__18,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_IN_ARB[2].u_in_arbiter,6,GEN_IN_ARB[2].u_in_arbiter,NOC_ARBITER__17,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_IN_ARB[3].u_in_arbiter,6,GEN_IN_ARB[3].u_in_arbiter,NOC_ARBITER__16,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_IN_ARB[4].u_in_arbiter,6,GEN_IN_ARB[4].u_in_arbiter,NOC_ARBITER__15,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[0].u_xy_routing,6,GEN_XY[0].u_xy_routing,noc_xy_routing__59,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[12].u_xy_routing,6,GEN_XY[12].u_xy_routing,noc_xy_routing__47,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[13].u_xy_routing,6,GEN_XY[13].u_xy_routing,noc_xy_routing__46,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[14].u_xy_routing,6,GEN_XY[14].u_xy_routing,noc_xy_routing__45,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[1].u_xy_routing,6,GEN_XY[1].u_xy_routing,noc_xy_routing__58,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[2].u_xy_routing,6,GEN_XY[2].u_xy_routing,noc_xy_routing__57,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[6].u_xy_routing,6,GEN_XY[6].u_xy_routing,noc_xy_routing__53,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[7].u_xy_routing,6,GEN_XY[7].u_xy_routing,noc_xy_routing__52,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_allocator / GEN_XY[8].u_xy_routing,6,GEN_XY[8].u_xy_routing,noc_xy_routing__51,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_credit_control,5,u_credit_control,noc_credit_control__3,156,156,0,0,45,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_crossbar,5,u_crossbar,noc_crossbar__3,114,114,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath,5,u_datapath,noc_router_datapath__3,624,390,234,0,87,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / east_vc0_fifo,6,east_vc0_fifo,noc_fifo__53,52,26,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / east_vc1_fifo,6,east_vc1_fifo,noc_fifo__52,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / east_vc2_fifo,6,east_vc2_fifo,noc_fifo__51,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / local_vc0_fifo,6,local_vc0_fifo,noc_fifo__47,57,31,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / local_vc1_fifo,6,local_vc1_fifo,noc_fifo__46,55,29,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / local_vc2_fifo,6,local_vc2_fifo,noc_fifo__45,56,30,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / north_vc0_fifo,6,north_vc0_fifo,noc_fifo__59,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / north_vc1_fifo,6,north_vc1_fifo,noc_fifo__58,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / north_vc2_fifo,6,north_vc2_fifo,noc_fifo__57,56,30,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / south_vc0_fifo,6,south_vc0_fifo,noc_fifo__56,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / south_vc1_fifo,6,south_vc1_fifo,noc_fifo__55,3,3,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / south_vc2_fifo,6,south_vc2_fifo,noc_fifo__54,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / west_vc0_fifo,6,west_vc0_fifo,noc_fifo__50,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / west_vc1_fifo,6,west_vc1_fifo,noc_fifo__49,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_datapath / west_vc2_fifo,6,west_vc2_fifo,noc_fifo__48,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[3].r / u_eject_fifo,5,u_eject_fifo,noc_fifo__parameterized0__3,72,46,26,0,12,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r,4,GEN_R[4].r,noc_router__4,1990,1652,338,0,246,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator,5,u_allocator,NOC_ALLOCATOR__4,578,578,0,0,50,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_ARB[0].u_arbiter,6,GEN_ARB[0].u_arbiter,NOC_ARBITER__parameterized0__24,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_ARB[1].u_arbiter,6,GEN_ARB[1].u_arbiter,NOC_ARBITER__parameterized0__23,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_ARB[2].u_arbiter,6,GEN_ARB[2].u_arbiter,NOC_ARBITER__parameterized0__22,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_ARB[3].u_arbiter,6,GEN_ARB[3].u_arbiter,NOC_ARBITER__parameterized0__21,30,30,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_ARB[4].u_arbiter,6,GEN_ARB[4].u_arbiter,NOC_ARBITER__parameterized0__20,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_IN_ARB[0].u_in_arbiter,6,GEN_IN_ARB[0].u_in_arbiter,NOC_ARBITER__24,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_IN_ARB[1].u_in_arbiter,6,GEN_IN_ARB[1].u_in_arbiter,NOC_ARBITER__23,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_IN_ARB[2].u_in_arbiter,6,GEN_IN_ARB[2].u_in_arbiter,NOC_ARBITER__22,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_IN_ARB[3].u_in_arbiter,6,GEN_IN_ARB[3].u_in_arbiter,NOC_ARBITER__21,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_IN_ARB[4].u_in_arbiter,6,GEN_IN_ARB[4].u_in_arbiter,NOC_ARBITER__20,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[0].u_xy_routing,6,GEN_XY[0].u_xy_routing,noc_xy_routing__74,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[10].u_xy_routing,6,GEN_XY[10].u_xy_routing,noc_xy_routing__64,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[11].u_xy_routing,6,GEN_XY[11].u_xy_routing,noc_xy_routing__63,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[12].u_xy_routing,6,GEN_XY[12].u_xy_routing,noc_xy_routing__62,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[13].u_xy_routing,6,GEN_XY[13].u_xy_routing,noc_xy_routing__61,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[14].u_xy_routing,6,GEN_XY[14].u_xy_routing,noc_xy_routing__60,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[1].u_xy_routing,6,GEN_XY[1].u_xy_routing,noc_xy_routing__73,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[2].u_xy_routing,6,GEN_XY[2].u_xy_routing,noc_xy_routing__72,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[6].u_xy_routing,6,GEN_XY[6].u_xy_routing,noc_xy_routing__68,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[7].u_xy_routing,6,GEN_XY[7].u_xy_routing,noc_xy_routing__67,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[8].u_xy_routing,6,GEN_XY[8].u_xy_routing,noc_xy_routing__66,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_allocator / GEN_XY[9].u_xy_routing,6,GEN_XY[9].u_xy_routing,noc_xy_routing__65,4,4,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_credit_control,5,u_credit_control,noc_credit_control__4,153,153,0,0,45,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_crossbar,5,u_crossbar,noc_crossbar__4,296,296,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath,5,u_datapath,noc_router_datapath__4,802,490,312,0,102,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / east_vc0_fifo,6,east_vc0_fifo,noc_fifo__68,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / east_vc1_fifo,6,east_vc1_fifo,noc_fifo__67,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / east_vc2_fifo,6,east_vc2_fifo,noc_fifo__66,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / local_vc0_fifo,6,local_vc0_fifo,noc_fifo__62,51,25,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / local_vc1_fifo,6,local_vc1_fifo,noc_fifo__61,52,26,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / local_vc2_fifo,6,local_vc2_fifo,noc_fifo__60,51,25,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / north_vc0_fifo,6,north_vc0_fifo,noc_fifo__74,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / north_vc1_fifo,6,north_vc1_fifo,noc_fifo__73,55,29,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / north_vc2_fifo,6,north_vc2_fifo,noc_fifo__72,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / south_vc0_fifo,6,south_vc0_fifo,noc_fifo__71,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / south_vc1_fifo,6,south_vc1_fifo,noc_fifo__70,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / south_vc2_fifo,6,south_vc2_fifo,noc_fifo__69,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / west_vc0_fifo,6,west_vc0_fifo,noc_fifo__65,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / west_vc1_fifo,6,west_vc1_fifo,noc_fifo__64,55,29,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_datapath / west_vc2_fifo,6,west_vc2_fifo,noc_fifo__63,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[4].r / u_eject_fifo,5,u_eject_fifo,noc_fifo__parameterized0__4,72,46,26,0,12,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r,4,GEN_R[5].r,noc_router__5,1469,1213,256,0,225,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator,5,u_allocator,NOC_ALLOCATOR__5,499,499,0,0,50,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_ARB[0].u_arbiter,6,GEN_ARB[0].u_arbiter,NOC_ARBITER__parameterized0__29,28,28,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_ARB[1].u_arbiter,6,GEN_ARB[1].u_arbiter,NOC_ARBITER__parameterized0__28,28,28,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_ARB[2].u_arbiter,6,GEN_ARB[2].u_arbiter,NOC_ARBITER__parameterized0__27,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_ARB[3].u_arbiter,6,GEN_ARB[3].u_arbiter,NOC_ARBITER__parameterized0__26,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_ARB[4].u_arbiter,6,GEN_ARB[4].u_arbiter,NOC_ARBITER__parameterized0__25,29,29,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_IN_ARB[0].u_in_arbiter,6,GEN_IN_ARB[0].u_in_arbiter,NOC_ARBITER__29,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_IN_ARB[1].u_in_arbiter,6,GEN_IN_ARB[1].u_in_arbiter,NOC_ARBITER__28,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_IN_ARB[2].u_in_arbiter,6,GEN_IN_ARB[2].u_in_arbiter,NOC_ARBITER__27,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_IN_ARB[3].u_in_arbiter,6,GEN_IN_ARB[3].u_in_arbiter,NOC_ARBITER__26,4,4,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_IN_ARB[4].u_in_arbiter,6,GEN_IN_ARB[4].u_in_arbiter,NOC_ARBITER__25,3,3,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[0].u_xy_routing,6,GEN_XY[0].u_xy_routing,noc_xy_routing__89,2,2,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[10].u_xy_routing,6,GEN_XY[10].u_xy_routing,noc_xy_routing__79,2,2,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[11].u_xy_routing,6,GEN_XY[11].u_xy_routing,noc_xy_routing__78,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[12].u_xy_routing,6,GEN_XY[12].u_xy_routing,noc_xy_routing__77,2,2,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[13].u_xy_routing,6,GEN_XY[13].u_xy_routing,noc_xy_routing__76,2,2,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[14].u_xy_routing,6,GEN_XY[14].u_xy_routing,noc_xy_routing__75,2,2,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[1].u_xy_routing,6,GEN_XY[1].u_xy_routing,noc_xy_routing__88,3,3,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[2].u_xy_routing,6,GEN_XY[2].u_xy_routing,noc_xy_routing__87,2,2,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_allocator / GEN_XY[9].u_xy_routing,6,GEN_XY[9].u_xy_routing,noc_xy_routing__80,2,2,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_credit_control,5,u_credit_control,noc_credit_control__5,149,149,0,0,45,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_crossbar,5,u_crossbar,noc_crossbar__5,108,108,0,0,0,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath,5,u_datapath,noc_router_datapath__5,586,352,234,0,87,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / east_vc0_fifo,6,east_vc0_fifo,noc_fifo__83,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / east_vc1_fifo,6,east_vc1_fifo,noc_fifo__82,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / east_vc2_fifo,6,east_vc2_fifo,noc_fifo__81,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / local_vc0_fifo,6,local_vc0_fifo,noc_fifo__77,51,25,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / local_vc1_fifo,6,local_vc1_fifo,noc_fifo__76,48,22,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / local_vc2_fifo,6,local_vc2_fifo,noc_fifo__75,48,22,26,0,7,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / north_vc0_fifo,6,north_vc0_fifo,noc_fifo__89,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / north_vc1_fifo,6,north_vc1_fifo,noc_fifo__88,54,28,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / north_vc2_fifo,6,north_vc2_fifo,noc_fifo__87,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / south_vc0_fifo,6,south_vc0_fifo,noc_fifo__86,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / south_vc1_fifo,6,south_vc1_fifo,noc_fifo__85,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / south_vc2_fifo,6,south_vc2_fifo,noc_fifo__84,2,2,0,0,3,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / west_vc0_fifo,6,west_vc0_fifo,noc_fifo__80,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / west_vc1_fifo,6,west_vc1_fifo,noc_fifo__79,51,25,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_datapath / west_vc2_fifo,6,west_vc2_fifo,noc_fifo__78,52,26,26,0,8,0,0,0
+pq_merged_board_top / u_core / u_p7 / mesh / GEN_R[5].r / u_eject_fifo,5,u_eject_fifo,noc_fifo__parameterized0__5,51,29,22,0,12,0,0,0
+pq_merged_board_top / u_core / u_p7 / quarantine,3,quarantine,noc_ingress_quarantine,5,5,0,0,6,0,0,0
+pq_merged_board_top / u_core / u_p7 / rstb,3,rstb,rst_bridge,7,7,0,0,2,0,0,0
+pq_merged_board_top / u_core / u_p7 / verifier,3,verifier,pq_rot_verifier,5802,5802,0,0,4621,0,0,0
+pq_merged_board_top / u_core / u_p7 / verifier / kdf,4,kdf,pq_kdf_xk,14,14,0,0,265,0,0,0
+pq_merged_board_top / u_core / u_p7 / verifier / kshare,4,kshare,pq_kmac_share,5325,5325,0,0,3007,0,0,0
+pq_merged_board_top / u_core / u_p7 / verifier / kshare / u_kmac,5,u_kmac,kmac128__parameterized0,5176,5176,0,0,3007,0,0,0
+pq_merged_board_top / u_core / u_p7 / verifier / kshare / u_kmac / u_keccak,6,u_keccak,keccak_f1600,4522,4522,0,0,1658,0,0,0
+pq_merged_board_top / u_core / u_p7 / verifier / kshare / u_kmac / u_kmac_encode,6,u_kmac_encode,kmac_encode__parameterized0,578,578,0,0,536,0,0,0
+pq_merged_board_top / u_core / u_p7 / verifier / tagger,4,tagger,pq_attestation_tag_xk,295,295,0,0,777,0,0,0

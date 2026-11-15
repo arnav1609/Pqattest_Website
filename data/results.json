@@ -1,0 +1,53 @@
+{
+  "builds": [
+    { "id": "B-20261112-1735", "label": "12 Nov 2026, built from the project (Generate Bitstream)", "currency": "CURRENT_BUILD", "maturity": "ROUTED",
+      "lut": 34952, "lutPct": "55 % of 63,400", "ff": 25328, "bram": 20, "dsp": 0, "wns": "+0.120", "whs": "+0.009", "tns": "0.000", "ths": "0.000",
+      "route": 0, "drc": 0, "board": "Not run on the board", "evidenceRefs": ["E-GATE", "E-UTIL"] },
+    { "id": "B-20261112-1405", "label": "12 Nov 2026, release flow", "currency": "CURRENT_BUILD", "maturity": "ROUTED",
+      "lut": 34952, "lutPct": "55 % of 63,400", "ff": 25328, "bram": 20, "dsp": 0, "wns": "+0.120", "whs": "+0.009", "tns": "0.000", "ths": "0.000",
+      "route": 0, "drc": 0, "board": "Not run on the board", "evidenceRefs": ["E-GATE"] },
+    { "id": "B-20261107", "label": "7 Nov 2026, earlier image", "currency": "HISTORICAL", "maturity": "HARDWARE_VALIDATED",
+      "lut": 34987, "lutPct": "55 % of 63,400", "ff": null, "bram": null, "dsp": null, "wns": "+0.237", "whs": "+0.035", "tns": null, "ths": null,
+      "route": null, "drc": null, "board": "Owner reported \"Board shows PASS\"; observations not itemised", "evidenceRefs": ["E-HW"] }
+  ],
+  "checks": [
+    { "name": "Timing constraints met", "value": "Yes, at 20 ns (50 MHz)", "ref": "E-GATE" },
+    { "name": "check_timing", "value": "Clean", "ref": "E-GATE" },
+    { "name": "Routing errors", "value": "0", "ref": "E-GATE" },
+    { "name": "Design-rule (DRC) violations", "value": "0", "ref": "E-GATE" },
+    { "name": "Methodology findings", "value": "12: 11 warnings (same min and max delay on an I/O port) and 1 advisory (RAM retargeting)", "ref": "E-GATE" },
+    { "name": "Clock-domain crossings", "value": "None reported by report_cdc (one design clock). Buttons and the switch are asynchronous inputs that pass through two-flop synchronisers", "ref": "E-CDC" },
+    { "name": "Unconstrained endpoints, timing loops, latch loops", "value": "0 / 0 / 0", "ref": "E-CDC" },
+    { "name": "Firmware present in both CPUs' memory", "value": "Yes (4 of 4 RAMs each)", "ref": "E-GATE" },
+    { "name": "Formal proof", "value": "Not done", "ref": null },
+    { "name": "Code or functional coverage", "value": "Not measured", "ref": null },
+    { "name": "Current image run on the board", "value": "Not done", "ref": null }
+  ],
+  "comparison": {
+    "note": "Same device, clock and tool. The baseline keeps the mesh, network interfaces and memory front end and removes cryptography and admission control. It is a research build, never a release image.",
+    "rows": [
+      { "metric": "LUTs", "secure": "34,952", "baseline": "15,814", "ref": "E-BASE" },
+      { "metric": "Setup slack (WNS)", "secure": "+0.120 ns", "baseline": "+0.327 ns", "ref": "E-BASE" },
+      { "metric": "Hold slack (WHS)", "secure": "+0.009 ns", "baseline": "+0.028 ns", "ref": "E-BASE" },
+      { "metric": "Memory read, request to response", "secure": "32 cycles", "baseline": "28 cycles", "ref": "E-MATCHED" },
+      { "metric": "Memory write, request to response", "secure": "32 cycles", "baseline": "27 cycles", "ref": "E-MATCHED" },
+      { "metric": "Workload throughput (64 transactions)", "secure": "0.0179 per cycle (3,577 cycles)", "baseline": "0.0195 per cycle (3,289 cycles)", "ref": "E-MATCHED" }
+    ]
+  },
+  "scope": [
+    { "item": "3x2 mesh network, XY routing, wormhole, credits, 3 virtual channels", "status": "Built and routed", "note": "" },
+    { "item": "Two RISC-V processor tiles (PicoRV32)", "status": "Built and routed", "note": "Demo firmware is RV32I assembly" },
+    { "item": "Shared memory with authorization checked on every access", "status": "Built and routed", "note": "" },
+    { "item": "Root of trust: challenge, grant, revoke", "status": "Built and routed", "note": "Attests one tile (tile 3)" },
+    { "item": "SHA3-256 measurement and KMAC128 tags", "status": "Built and routed", "note": "Symmetric cryptography" },
+    { "item": "Authenticated control link between tiles 3 and 4 with replay rejection", "status": "Built and routed", "note": "" },
+    { "item": "Forged-packet rejection through the untrusted port", "status": "Shown in simulation", "note": "The port is tied off in the board image" },
+    { "item": "Board run of the current image", "status": "Pending", "note": "A 7 Nov image was reported as passing; not itemised" },
+    { "item": "Attestation of every tile", "status": "Not built", "note": "Tile 0 is deliberately never authorized; tiles 1, 2 and 5 are not attested" },
+    { "item": "Periodic (continuous) re-attestation", "status": "Not built", "note": "Re-attestation is on demand (button 1)" },
+    { "item": "Second board and physical attacker link", "status": "Not built", "note": "Proposed originally; one board is used" },
+    { "item": "NTT, ML-KEM, ML-DSA, post-quantum signatures", "status": "Not built", "note": "Proposed originally" },
+    { "item": "Formal proof, side-channel protection, true random number generator", "status": "Not built", "note": "Not claimed" },
+    { "item": "ASIC flow (RTL to GDSII)", "status": "Not started", "note": "Planned next stage" }
+  ]
+}
