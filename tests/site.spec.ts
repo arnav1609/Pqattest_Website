@@ -43,7 +43,7 @@ test('block list is keyboard operable and drives the inspector', async ({ page }
   await page.locator('#q').fill('verifier');
   await page.keyboard.press('Tab'); await page.keyboard.press('Enter');
   await expect(page.locator('#insp .selname')).toHaveText('RoT verifier');
-  await expect(page.locator('#insp')).toContainText('5,807');
+  await expect(page.locator('#insp')).toContainText('5,802');
   await expect(page.locator('#insp .badges')).toContainText('Current build');
   expect(await run<string>(page, 'return p.st.sel')).toBe('ver');
   await expect(page).toHaveURL(/#explore\/boot\/ver$/);

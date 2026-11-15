@@ -61,7 +61,7 @@ test('How it works animation: steps, memory, UART, gate and refusal follow the d
 
 test('tile card: every tile shows name, purpose, resources, what it does and its demo role', async ({ page }) => {
   await page.goto('/#explore'); await page.waitForFunction(ready);
-  const expect3: Record<number, [string, string]> = { 0: ['Tile 0 \u2014 RISC-V CPU B', '2,561'], 1: ['Tile 1 \u2014 Network tile', '32'], 2: ['Tile 2 \u2014 Shared memory', '4'], 3: ['Tile 3 \u2014 RISC-V CPU A', '2,691'], 4: ['Tile 4 \u2014 Root of trust', '5,807'], 5: ['Tile 5 \u2014 Untrusted port', '5'] };
+  const expect3: Record<number, [string, string]> = { 0: ['Tile 0 \u2014 RISC-V CPU B', '2,566'], 1: ['Tile 1 \u2014 Network tile', '32'], 2: ['Tile 2 \u2014 Shared memory', '4'], 3: ['Tile 3 \u2014 RISC-V CPU A', '8,117'], 4: ['Tile 4 \u2014 Root of trust', '5,802'], 5: ['Tile 5 \u2014 Untrusted port', '5'] };
   for (let t = 0; t < 6; t++) {
     await page.locator(`.tilebar [data-tile="${t}"]`).click();
     const card = page.locator('#insp');

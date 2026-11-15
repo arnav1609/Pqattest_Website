@@ -32,8 +32,8 @@ const STEPS: Step[] = [
   { title: 'Power on', who: 'The board', dur: 2200, text: 'The clock starts and both processors begin running their firmware. LED 3 blinks as a heartbeat.',
     why: 'Nothing is trusted yet: tile 3 cannot use the shared memory.', tech: 'Board 100 MHz oscillator, MMCM to one 50 MHz clock; LED 3 is bit 24 of a counter.',
     run: (p, v) => { v.power(p > 0.05); v.activeTiles([0, 3]); v.glow(p > 0.3 ? ['cpuA', 'cpuB'] : []); } },
-  { title: 'Measure tile 3', who: 'Tile 3 \u00b7 CPU A', dur: 3200, text: 'The start of tile 3\u2019s firmware is read out and turned into a fingerprint.',
-    why: 'Any change to the firmware gives a different fingerprint.', tech: 'SHA3-256 over tile ID, configuration and the first 64 bytes of the instruction memory.',
+  { title: 'Measure tile 3', who: 'Tile 3 \u00b7 CPU A', dur: 3200, text: 'Tile 3\u2019s complete 16KB firmware is hashed by a dedicated measurement engine and turned into a fingerprint.',
+    why: 'Any change to the firmware gives a different fingerprint.', tech: 'meas_imem_hasher runs SHA3-256 over all 4,096 words (16KB) of IMEM; the 32-byte digest plus metadata form the 64-byte field hashed by the endpoint.',
     run: (p, v) => { v.activeTiles([3]); v.meas(p); v.glow(['cpuA', 'ep']); } },
   { title: 'Challenge', who: 'Tile 4 \u00b7 Root of trust', dur: 2600, text: 'The root of trust asks tile 3 to prove it can be trusted. The question travels one hop, from router 4 to router 3.',
     why: 'A fresh question each time means an old answer cannot be replayed.', tech: '224-bit challenge on virtual channel 2; the link adds a KMAC128 tag and a sequence number.',
@@ -116,7 +116,7 @@ export function mountHowAnimation(host: HTMLElement, reduce: boolean, prefix = '
   for (let i = 0; i < 4; i++) { el('rect', { x: 656 + i * 45, y: 102, width: 40, height: 26, rx: 3, class: 'h-cell' }, svg); cellT.push(el('text', { x: 676 + i * 45, y: 120, class: 'h-cv' }, svg, '--')); }
   box('cpuA', 56, 240, 64, 38, 'CPU A'); box('brA', 124, 240, 44, 38, 'bridge', 'small'); box('ep', 172, 240, 64, 38, 'attest EP', 'small');
   const imem: SVGRectElement[] = []; for (let i = 0; i < 4; i++) imem.push(el('rect', { x: 56 + i * 16, y: 284, width: 13, height: 12, rx: 2, class: 'h-imem' }, svg));
-  el('text', { x: 124, y: 295, class: 'h-note' }, svg, 'IMEM, first 64 B');
+  el('text', { x: 124, y: 295, class: 'h-note' }, svg, 'IMEM, 16KB');
   const measT = el('text', { x: 312, y: 230, class: 'h-note', 'text-anchor': 'end' }, svg, '');
   box('rot', 356, 240, 180, 40, 'root of trust'); const rotT = el('text', { x: 446, y: 302, class: 'h-note mid' }, svg, 'idle');
   box('l2', 360, 330, 150, 20, 'L2 link: tiles 3 ↔ 4', 'small ghost');

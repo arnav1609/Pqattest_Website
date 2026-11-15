@@ -181,7 +181,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   const styleOf = (c: Component): Style => c.id === 'bram' ? 'tsop' : c.id === 'spoof' ? 'header' : ({ router: 'qfn', ni: 'sot', cpu: 'module', sub: 'chip', crypto: 'ceramic', mem: 'qfn', untrusted: 'qfn', plain: 'footprint', clock: 'can' } as Record<string, Style>)[c.type] ?? 'qfn';
   const HGT: Record<Style, number> = { qfn: 0.95, sot: 0.55, module: 0.45, chip: 0.5, ceramic: 1.05, tsop: 0.85, header: 0.95, footprint: 0.05, can: 0.4 };
   const STAND: Record<Style, number> = { qfn: 0.05, sot: 0.12, module: 0.02, chip: 0.04, ceramic: 0, tsop: 0.12, header: 0.02, footprint: 0, can: 0 };
-  const SUBNAME: Record<string, string> = { core: 'PicoRV32', mem: 'IMEM DMEM', meas: 'MEAS 64 B', bridge: 'TMEM BRIDGE' };
+  const SUBNAME: Record<string, string> = { core: 'PicoRV32', mem: 'IMEM DMEM', meas: 'IMEM HASHER', bridge: 'TMEM BRIDGE' };
   const markOf = (c: Component): string[] => {
     const lut = c.metrics.lut !== undefined ? fmt(c.metrics.lut) + ' LUT' : '';
     switch (c.id) { case 'endp': return ['PQ-ATTEST', 'SHA3 KMAC', lut]; case 'l2': return ['L2 AUTH LINK', 'KMAC128', lut]; case 'ver': return ['RoT VERIFIER', 'T4', lut];

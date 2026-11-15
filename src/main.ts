@@ -433,7 +433,7 @@ $('#speed').addEventListener('change', (e) => { st.speed = parseFloat((e.target 
 $('#bdemo').addEventListener('click', () => {
   if (!api) { fallbackHow?.go(0, true); $('#stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); return; }
   if (st.tour) { stopTour(); st.playing = false; paint(); return; }
-  st.tour = true; api.setView('home'); st.sc = 0; seek(0, true); writeHash(); $('#stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); });
+  st.tour = true; $('#bdemo').textContent = 'Stop the demo'; api.setView('home'); st.sc = 0; seek(0, true); writeHash(); $('#stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); });
 
 // ---------------------------------------------------------------- camera and view controls
 $('#view').addEventListener('change', (e) => api?.setView((e.target as HTMLSelectElement).value));
@@ -556,19 +556,19 @@ const PAGES: Record<string, () => string> = {
       <div class="kpi"><b>${fmt(cur.lut)}</b><span>LUTs</span><small>${esc(cur.lutPct)}</small></div>
       <div class="kpi"><b>${fmt(cur.ff!)}</b><span>Flip-flops</span><small>of 126,800</small></div>
       <div class="kpi"><b>${cur.bram}</b><span>Block RAMs</span><small>of 135</small></div>
-      <div class="kpi"><b>50 MHz</b><span>Timing met</span><small>setup +0.120 ns · hold +0.009 ns</small></div>
+      <div class="kpi"><b>50 MHz</b><span>Timing met</span><small>setup ${cur.wns} ns · hold ${cur.whs} ns</small></div>
     </div>
     <div class="cols"><div>
     <h2>What works</h2><ul class="works">${results.scope.filter((s) => s.status === 'Built and routed' || s.status === 'Shown in simulation').map((s) => `<li><b>${esc(s.item)}</b><small>${esc(s.status)}${s.note ? ' · ' + esc(s.note) : ''}</small></li>`).join('')}</ul>
     </div><div>
     <h2>Cost of the security logic</h2><p>Compared with the same network and memory without attestation (a research build, never a release image):</p>
     ${table(['Measure', 'Secure', 'Without'], results.comparison.rows.map((r) => [esc(r.metric), esc(r.secure), esc(r.baseline)]))}
-    <h2>On the board</h2><p>An image from 7 November was reported as passing on the board by the project owner (observations not itemised). The current 12 November image has not yet been run on the board.</p>
+    <h2>On the board</h2><p>An image from 7 November was reported as passing on the board by the project owner (observations not itemised). The current 15 November image has not yet been run on the board.</p>
     </div></div>
     <details class="evid"><summary>Full build and verification evidence</summary>
     <h2>Builds</h2>${table(['Build', 'Status', 'LUTs', 'Flip-flops', 'Block RAM', 'Setup slack (ns)', 'Hold slack (ns)', 'Board'],
       results.builds.map((b) => [esc(b.label), `${esc(LABEL[b.maturity])}; ${esc(LABEL[b.currency])}`, `${nn(b.lut)} <small>${esc(b.lutPct)}</small>`, nn(b.ff), nn(b.bram), nn(b.wns), nn(b.whs), esc(b.board)]))}
-    <p class="muted">The hold margin of the current build (+0.009 ns) is thin but positive. Each build embeds its build time, so two builds of the same sources produce different image files.</p>
+    <p class="muted">The hold margin of the current build (+0.007 ns) is thin but positive. Each build embeds its build time, so two builds of the same sources produce different image files.</p>
     <h2>Checks on the current build</h2>${table(['Check', 'Result', 'Source'], results.checks.map((c) => [esc(c.name), esc(c.value), refName(c.ref)]))}
     <h2>Comparison sources</h2><p>${esc(results.comparison.note)}</p>${table(['Measure', 'Source'], results.comparison.rows.map((r) => [esc(r.metric), refName(r.ref)]))}
     <h2>Evidence used on this site</h2>${table(['Evidence', 'Kind', 'Date', 'Build', 'What it shows', 'Limits'], [...evidence.values()].map((e) => [esc(e.title), esc(e.kind), esc(e.date), esc(LABEL[e.currency]), esc(e.says), esc(e.limits)]))}

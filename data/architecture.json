@@ -1,7 +1,7 @@
 {
   "build": {
-    "id": "B-20261112-1735",
-    "label": "12 Nov 2026 build",
+    "id": "R10-OWNER-GUI-20261115-1226",
+    "label": "Revision 10 - firmware v3 - owner GUI build, 15 November 2026",
     "device": "xc7a100tcsg324-1",
     "board": "Arty A7-100T",
     "tool": "Vivado 2024.1",
@@ -76,8 +76,9 @@
       "primary": "cpuA",
       "purpose": "The processor that must prove it can be trusted before it may use the shared memory.",
       "does": [
-        "Measures its own firmware (the first 64 bytes of its instruction memory) with SHA3-256.",
+        "Measures its own firmware (the whole 16KB instruction memory, 4096 words) with SHA3-256.",
         "Answers the root of trust’s challenge with that measurement and a KMAC128 tag.",
+        "Successful instruction fetches are constrained to IMEM; fetches from DMEM, MMIO or remote ports are refused.",
         "Once granted, writes 0xC0DE5A5A to the shared memory, reads it back and prints “T3 PASS”."
       ]
     },
@@ -183,8 +184,8 @@
         "E-UTIL"
       ],
       "metrics": {
-        "lut": 34952,
-        "ff": 25328,
+        "lut": 39962,
+        "ff": 29187,
         "bram": 20
       },
       "ports": [
@@ -216,10 +217,10 @@
       "interfaces": [
         "12 board pins; no bus interface leaves the design"
       ],
-      "summary": "The whole design as built for the FPGA: 34,952 LUTs, 25,328 flip-flops and 20 block RAMs, about 55 % of the device's LUTs.",
+      "summary": "The whole design as built for the FPGA: 39,962 LUTs, 29,187 flip-flops and 20 block RAMs, about 63.0 % of the device's 63,400 LUTs.",
       "detail": [
         "This is FPGA logic, not a fabricated chip. No ASIC exists.",
-        "Timing met at 20 ns: worst setup slack +0.120 ns, worst hold slack +0.009 ns."
+        "Timing met at 20 ns: worst setup slack +0.182 ns, worst hold slack +0.007 ns."
       ]
     },
     {
@@ -235,9 +236,9 @@
         "h": 0.9
       },
       "metrics": {
-        "lutShare": 1705,
+        "lutShare": 1686,
         "bram": 0,
-        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+        "note": "Mesh total for all six routers: 10,116 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
       }
     },
     {
@@ -253,9 +254,9 @@
         "h": 0.9
       },
       "metrics": {
-        "lutShare": 1705,
+        "lutShare": 1686,
         "bram": 0,
-        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+        "note": "Mesh total for all six routers: 10,116 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
       }
     },
     {
@@ -271,9 +272,9 @@
         "h": 0.9
       },
       "metrics": {
-        "lutShare": 1705,
+        "lutShare": 1686,
         "bram": 0,
-        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+        "note": "Mesh total for all six routers: 10,116 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
       }
     },
     {
@@ -289,9 +290,9 @@
         "h": 0.9
       },
       "metrics": {
-        "lutShare": 1705,
+        "lutShare": 1686,
         "bram": 0,
-        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+        "note": "Mesh total for all six routers: 10,116 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
       }
     },
     {
@@ -307,9 +308,9 @@
         "h": 0.9
       },
       "metrics": {
-        "lutShare": 1705,
+        "lutShare": 1686,
         "bram": 0,
-        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+        "note": "Mesh total for all six routers: 10,116 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
       }
     },
     {
@@ -325,9 +326,9 @@
         "h": 0.9
       },
       "metrics": {
-        "lutShare": 1705,
+        "lutShare": 1686,
         "bram": 0,
-        "note": "Mesh total for all six routers: 10,230 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
+        "note": "Mesh total for all six routers: 10,116 LUTs, 1,916 flip-flops, 0 block RAMs. Not measured per router."
       }
     },
     {
@@ -345,7 +346,7 @@
         "h": 0.5
       },
       "metrics": {
-        "lut": 29,
+        "lut": 28,
         "ff": 18,
         "bram": 0
       }
@@ -385,7 +386,7 @@
         "h": 0.5
       },
       "metrics": {
-        "lut": 276,
+        "lut": 275,
         "ff": 103,
         "bram": 0
       }
@@ -459,7 +460,7 @@
         "h": 0.7
       },
       "metrics": {
-        "lut": 2561,
+        "lut": 2566,
         "ff": 1585,
         "bram": 8
       },
@@ -511,7 +512,7 @@
         "slot": 1
       },
       "metrics": {
-        "lut": 24,
+        "lut": 29,
         "ff": 2,
         "bram": 8
       },
@@ -645,8 +646,8 @@
         "h": 0.7
       },
       "metrics": {
-        "lut": 2691,
-        "ff": 2249,
+        "lut": 8117,
+        "ff": 6622,
         "bram": 8
       },
       "scenarioRefs": [
@@ -665,9 +666,10 @@
         "UART TX",
         "GPIO (LEDs)"
       ],
-      "summary": "A PicoRV32 processor and the one tile that gets attested. Once the root of trust grants access, its program can use the shared memory on tile 2.",
+      "summary": "A PicoRV32 processor with a whole-IMEM SHA3-256 hasher, and the one tile that gets attested. Once the root of trust grants access, its program can use the shared memory on tile 2.",
       "detail": [
-        "Runs the demo firmware (RV32I assembly).",
+        "Runs demo firmware v3 (RV32I assembly).",
+        "Measures the entire 16KB IMEM (4,096 words); local execution is constrained to IMEM.",
         "Prints \"T3 PASS\" on the UART and sets LED pattern 0001 after a correct write and read-back.",
         "Shares the tile's network port with the PQ-Attest endpoint."
       ]
@@ -683,7 +685,7 @@
         "slot": 0
       },
       "metrics": {
-        "lut": 75,
+        "lut": 72,
         "ff": 167,
         "bram": 0
       },
@@ -699,17 +701,17 @@
     },
     {
       "id": "cpuA.meas",
-      "name": "Measurement window reader",
+      "name": "Whole-IMEM hasher",
       "type": "sub",
       "tileId": 3,
       "parentId": "cpuA",
-      "modulePath": "u_core/u_cpu_a/u_meas (meas_window_reader)",
+      "modulePath": "u_core/u_cpu_a/g_full.u_meas (meas_imem_hasher)",
       "geometry": {
         "slot": 1
       },
       "metrics": {
-        "lut": 51,
-        "ff": 524,
+        "lut": 5445,
+        "ff": 4897,
         "bram": 0
       },
       "scenarioRefs": [
@@ -719,7 +721,7 @@
         "E-UTIL",
         "E-RTL-CORE"
       ],
-      "summary": "Reads the first 64 bytes of the instruction memory and hands them to the PQ-Attest endpoint, which hashes them as part of the measurement."
+      "summary": "Hashes the complete 16KB instruction memory (4,096 words) with dedicated SHA3-256 and supplies the digest to the PQ-Attest endpoint as part of the measurement."
     },
     {
       "id": "cpuA.mem",
@@ -732,7 +734,7 @@
         "slot": 2
       },
       "metrics": {
-        "lut": 26,
+        "lut": 23,
         "ff": 2,
         "bram": 8
       },
@@ -749,7 +751,7 @@
         "slot": 3
       },
       "metrics": {
-        "lut": 2539,
+        "lut": 2577,
         "ff": 1553,
         "bram": 0
       },
@@ -768,8 +770,8 @@
         "h": 0.85
       },
       "metrics": {
-        "lut": 6619,
-        "ff": 8595,
+        "lut": 6362,
+        "ff": 8081,
         "bram": 0
       },
       "maturity": "ROUTED",
@@ -788,7 +790,7 @@
       ],
       "summary": "Answers the root of trust for tile 3. It measures the tile with SHA3-256 and returns the measurement with a KMAC128 tag.",
       "detail": [
-        "Measurement input: tile ID, configuration and a 64-byte window of the instruction memory.",
+        "Measurement input: tile ID, configuration and an encoded 64-byte field containing the 32-byte digest of the full 16KB IMEM, length, base address, and zeros.",
         "Challenge 224 bits; response payload 512 bits (measurement and tag).",
         "Symmetric cryptography only. No signature scheme is implemented."
       ]
@@ -806,7 +808,7 @@
         "h": 0.85
       },
       "metrics": {
-        "lut": 6612,
+        "lut": 6568,
         "ff": 5921,
         "bram": 0
       },
@@ -842,7 +844,7 @@
         "h": 0.85
       },
       "metrics": {
-        "lut": 5807,
+        "lut": 5802,
         "ff": 4621,
         "bram": 0
       },
@@ -860,7 +862,7 @@
       "summary": "The root of trust. It sends a challenge to tile 3, checks the returned measurement and tag, and then grants or revokes access.",
       "detail": [
         "Issues CHALLENGE, GRANT and REVOKE.",
-        "Attestation starts once after reset and again when button 1 is pressed; button 2 revokes.",
+        "Attestation starts once after reset and again when button 1 is pressed; button 2 revokes (firmware v3 waits indefinitely on buttons).",
         "There is no periodic re-attestation timer in this build."
       ]
     },

@@ -95,6 +95,17 @@ Still from the owner's fact list only: the 512-bit response payload split (measu
 - Virtual channels are told apart by shape and line pattern; the palette has three hue families only.
 - three.js and fonts are bundled; nothing loads from a CDN.
 
+## Sixth pass (15 Nov 2026): Revision 10 Integration
+
+| Item | Change | Status / Test |
+|---|---|---|
+| Revision 10 Build Data | Added `R10-OWNER-GUI-20261115-1226` as `CURRENT_BUILD`: 39,962 LUTs (63.0%), 29,187 FFs, 20 BRAMs, WNS +0.182 ns, WHS +0.007 ns, 4 implementation warnings, 11 methodology warnings, 1 advisory. 12 Nov RC1 moved to HISTORICAL. | `validate:data PASS`, `check-single PASS` |
+| Whole-IMEM Measurement | Replaced all "first 64 bytes" claims with complete 16KB (4,096 words) IMEM measurement via dedicated `meas_imem_hasher` (5,445 LUTs). Endpoint retains 64-byte encoded metadata field derived from the full hash. | `validate:data PASS`, `build PASS` |
+| Hierarchical Inclusive Resources | Updated CPU A tile inclusive to 8,117 LUTs (includes 5,445 LUT hasher with internal 5,429 LUT SHA3-256), CPU B to 2,566 LUTs, RoT verifier to 5,802 LUTs, Endpoint to 6,362 LUTs, L2 to 6,568 LUTs, Mesh to 10,116 LUTs (1,686 LUT share per router). | `validate:data PASS`, unit assertions updated |
+| Firmware v3 & Execution Boundary | Firmware v3 (`demo_fw_v3`) with unbounded revoke/re-attest button waits; IMEM-only execution boundary (local DMEM/MMIO fetch refused through existing poison/error). | Documented across architecture, scenarios, and learning |
+| Verification Increment I-27-R2 | Updated verification status: Increment I-27-R2 (31 fresh jobs, 7 mutation kills); original I-27 preserved as historical NOT PASSED. Hardware validation status remains pending. | Reflected in results and evidence |
+| Developer Metadata & Single File | Regenerated dev manifest and single-file distribution (838 kB); verified zero console errors, zero external requests, WebGL clean. | `npm run build:single` PASS |
+
 ## Verdicts (builder's own; to be replaced by the independent review)
 
 | Gate | Verdict | Condition |

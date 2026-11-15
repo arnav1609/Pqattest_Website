@@ -37,8 +37,8 @@ export const components: Component[] = (arch.components as unknown as Partial<Co
   const m = { ...d, ...c } as Component;
   if (!m.summary) m.summary = TYPE_SUMMARY[m.type] ?? '';
   if (m.type === 'router') {
-    m.geometryRule = 'Footprint from an equal share of the mesh total (10,230 LUT / 6 routers): an estimated allocation, not a per-router measurement';
-    m.detail = ['Whole mesh: 10,230 LUT, 1,916 flip-flops (measured).', 'Virtual channels: VC0 memory requests, VC1 memory responses, VC2 attestation control.'];
+    m.geometryRule = 'Footprint from an equal share of the mesh total (10,116 LUT / 6 routers): an estimated allocation, not a per-router measurement';
+    m.detail = ['Whole mesh: 10,116 LUT, 1,916 flip-flops (measured).', 'Virtual channels: VC0 memory requests, VC1 memory responses, VC2 attestation control.'];
   }
   m.coordinates = t ? `tile ${t.id} at (x ${t.x}, y ${t.y})` : 'not tied to one tile';
   m.adjacency = edges.filter((e) => e.a === m.id || e.b === m.id).map((e) => (e.a === m.id ? e.b : e.a));

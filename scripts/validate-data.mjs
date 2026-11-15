@@ -76,7 +76,7 @@ for (const b of res.builds) for (const r of b.evidenceRefs) if (!evIds.has(r)) e
 for (const c of res.checks.concat(res.comparison.rows)) if (c.ref && !evIds.has(c.ref)) err(`result ref ${c.ref} does not resolve`);
 for (const b of res.builds) if (b.currency === 'CURRENT_BUILD' && b.maturity === 'HARDWARE_VALIDATED') err(`build ${b.id}: current build has no board record`);
 const total = comps.find((c) => c.id === 'die').metrics.lut;
-const top = comps.filter((c) => c.parentId === 'die' && c.type !== 'router').reduce((a, c) => a + (c.metrics.lut || 0), 0) + 10230;
+const top = comps.filter((c) => c.parentId === 'die' && c.type !== 'router').reduce((a, c) => a + (c.metrics.lut || 0), 0) + 10116;
 if (top > total) err(`block LUTs (${top}) exceed the design total (${total}): double counting`);
 for (const p of comps.filter((c) => c.type === 'cpu')) {
   const kids = comps.filter((c) => c.parentId === p.id).reduce((a, c) => a + (c.metrics.lut || 0), 0);

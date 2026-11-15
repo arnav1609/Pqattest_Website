@@ -169,14 +169,14 @@ export const GLOSSARY: GlossaryEntry[] = [
     category: 'Hardware',
     def: 'Low-level software program stored directly inside a hardware component that runs automatically when power is turned on.',
     analogy: 'Like the built-in operating code programmed into a digital microwave or washing machine that tells it how to operate.',
-    inThisChip: 'The startup program stored in the first 64 bytes of the processor instruction memory.'
+    inThisChip: 'The startup program stored in the 16KB instruction memory of the processor (demo_fw_v3 in RV32I assembly).'
   },
   {
     term: 'Cryptographic Hash (SHA3-256)',
     category: 'Security',
     def: 'A one-way mathematical function that converts any amount of data into a fixed-length 256-bit digital fingerprint. If even a single bit of the original data changes, the resulting hash changes completely.',
     analogy: 'Like an unforgeable digital DNA sample of a document; altering a single comma creates a completely different DNA profile.',
-    inThisChip: 'The PQ-Attest endpoint hashes Tile 3’s startup firmware to generate a tamper-evident measurement.'
+    inThisChip: 'The dedicated meas_imem_hasher hashes Tile 3’s complete 16KB instruction memory to generate a tamper-evident measurement.'
   },
   {
     term: 'KMAC128 (Keyed Message Authentication Code)',
@@ -249,7 +249,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     category: 'Hardware',
     def: 'A miniature configurable logic building block on an FPGA that can compute any Boolean logic operation.',
     analogy: 'Like a tiny electronic truth table or mathematical calculator module.',
-    inThisChip: 'The design utilizes 34,952 LUTs (about 55.1% of the FPGA’s total capacity).'
+    inThisChip: 'The design utilizes 39,962 LUTs (about 63.0% of the FPGA’s 63,400 total capacity).'
   },
   {
     term: 'Flip-Flop (FF)',
@@ -257,7 +257,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     category: 'Hardware',
     def: 'A 1-bit electronic memory storage circuit that captures and holds a digital state on every tick of the system clock.',
     analogy: 'Like a tiny light switch that remembers whether it was set to ON or OFF.',
-    inThisChip: 'The design utilizes 25,328 flip-flops for internal pipeline registers and state machines.'
+    inThisChip: 'The design utilizes 29,187 flip-flops for internal pipeline registers and state machines.'
   },
   {
     term: 'Block RAM (BRAM)',
@@ -394,7 +394,7 @@ export const TILES_LEARNING: Record<number, TileLearning> = {
     whyNeeded: 'To prove how a legitimate processor can establish trust cryptographically without relying on blind assumptions or hardcoded vulnerabilities.',
     interaction: 'Performs an attestation handshake with Tile 4 (Root of Trust) and reads/writes shared data on Tile 2 (Shared Memory).',
     infoEnters: 'System clock, startup firmware, and cryptographic CHALLENGE, GRANT, or REVOKE packets from Tile 4.',
-    whatHappensInside: 'Reads the first 64 bytes of its instruction memory, hashes them with SHA3-256 to create a unique fingerprint, seals the fingerprint with a secret key using KMAC128, and unlocks its network bridge once granted access.',
+    whatHappensInside: 'Hashes its complete 16KB instruction memory (4,096 words) with a dedicated SHA3-256 engine to create an unforgeable fingerprint, packages it into a 64-byte field, seals the response with KMAC128, and unlocks its network bridge once granted access. Instruction fetches are constrained to IMEM.',
     infoLeaves: 'RESPONSE packets containing cryptographic proof to Tile 4, and authorized memory read/write requests to Tile 2.',
     securityBenefit: 'Guarantees that only genuine hardware running untampered, verified software can access the chip’s shared resources.',
     ifCompromised: 'If an attacker alters even a single bit of CPU A’s firmware, its cryptographic fingerprint changes, verification fails, and it is permanently locked out of shared memory.'
@@ -435,19 +435,19 @@ export const TILES_LEARNING: Record<number, TileLearning> = {
 export const SCENARIO_LEARNING: Record<string, EventLearning> = {
   'boot-1': {
     eventId: 'boot-1',
-    whatIsHappening: 'Tile 3’s processor starts up, and the hardware reads the first 64 bytes of its instruction memory into the cryptographic attestation engine.',
-    whyHappening: 'Before a processor can be trusted, the system must know exactly what software code it is running. Reading these startup instructions allows the hardware to calculate an unforgeable digital fingerprint.',
-    howItWorks: 'The hardware measurement unit reads the binary instructions from memory and feeds them into a SHA3-256 cryptographic hashing engine, combining them with Tile 3’s hardware ID and configuration settings.',
+    whatIsHappening: 'Tile 3’s processor starts up, and the dedicated hardware measurement engine hashes the entire 16KB instruction memory (4,096 words) into the cryptographic attestation pipeline.',
+    whyHappening: 'Before a processor can be trusted, the system must know exactly what software code it is running. Reading and hashing these startup instructions allows the hardware to calculate an unforgeable digital fingerprint.',
+    howItWorks: 'The dedicated meas_imem_hasher reads the 4,096 words of IMEM into a SHA3-256 cryptographic hashing engine, supplying an encoded 64-byte field to the PQ-Attest endpoint alongside Tile 3’s hardware ID and configuration settings.',
     analogy: 'Imagine taking a high-resolution fingerprint of a new employee’s ID badge and background record before letting them through the front lobby.',
     whatHappensNext: 'The calculated fingerprint is held securely inside Tile 3, waiting for the Root of Trust to challenge it.',
     realWorldSignificance: 'If software on a processor was modified by a hacker or infected with malware, its cryptographic fingerprint would change completely, immediately alerting the system to the intrusion.',
-    attemptedAction: 'Firmware sampling and initial measurement computation.',
+    attemptedAction: 'Whole-IMEM hashing and initial measurement computation.',
     initiatedBy: 'Tile 3 (CPU A) hardware measurement engine.',
-    checksPerformed: 'Sampling instruction memory window (first 64 bytes) and tile configuration registers.',
-    checkingComponent: 'On-tile measurement unit (cpuA.meas) and PQ-Attest endpoint.',
+    checksPerformed: 'Dedicated SHA3-256 hashing across all 4,096 words (16KB) of IMEM and tile configuration registers.',
+    checkingComponent: 'On-tile measurement unit (meas_imem_hasher) and PQ-Attest endpoint.',
     resultStatus: 'Accepted',
     resultCategory: 'ok',
-    whyResult: 'The instruction memory window is valid and the SHA3-256 hashing pipeline successfully initialized.',
+    whyResult: 'The instruction memory was completely hashed and the SHA3-256 pipeline successfully delivered the measurement field.',
     withoutSecurity: 'An infected processor could boot with corrupted or malicious instructions, and the system would never know it was compromised.'
   },
   'att-1': {
@@ -654,9 +654,9 @@ export const HOW_LEARNING: HowStepLearning[] = [
   {
     stepIndex: 1,
     title: 'Measure tile 3',
-    whatIsHappening: 'The hardware measurement unit on Tile 3 reads the first 64 bytes of its instruction memory and calculates a unique cryptographic fingerprint.',
+    whatIsHappening: 'The dedicated hardware measurement unit on Tile 3 hashes its entire 16KB (4,096 words) instruction memory with SHA3-256 and calculates a unique cryptographic fingerprint.',
     whyHappening: 'To ensure the processor is running genuine, untampered firmware before granting it network access.',
-    howItWorks: 'A hardware SHA3-256 pipeline processes the instruction memory bytes alongside the tile’s hardware ID to produce an immutable 256-bit measurement.',
+    howItWorks: 'The dedicated meas_imem_hasher processes all 4,096 words of IMEM alongside the tile’s hardware ID to produce an immutable 256-bit measurement.',
     analogy: 'Taking a digital biometric scan of an employee’s security pass to verify its authenticity.',
     whatHappensNext: 'Tile 3 stores this fingerprint, waiting for the Root of Trust to challenge it.',
     realWorldSignificance: 'If an adversary modified even one character in the firmware, the resulting fingerprint would be totally different, alerting the system.'

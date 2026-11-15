@@ -37,15 +37,15 @@
       "events": [
         {
           "id": "boot-1",
-          "label": "Measurement window",
+          "label": "Whole-IMEM measurement",
           "path": [
             "cpuA.meas",
             "endp"
           ],
           "vc": "local",
           "outcome": "accepted",
-          "what": "The first 64 bytes of tile 3's instruction memory go to the PQ-Attest endpoint.",
-          "why": "They are hashed with SHA3-256, together with the tile ID and configuration, to form the tile's measurement.",
+          "what": "The dedicated meas_imem_hasher hashes the entire 16KB (4,096 words) of tile 3's instruction memory with SHA3-256 and supplies the encoded 64-byte field to the PQ-Attest endpoint.",
+          "why": "The 32-byte digest, length, base address and zeros form the 64-byte field, hashed with tile ID and configuration to produce the tile's measurement.",
           "focus": [
             "cpuA",
             "cpuB",
@@ -53,8 +53,8 @@
           ],
           "actor": "cpuA",
           "who": "Tile 3 · CPU A",
-          "plain": "Tile 3’s firmware is read so that it can be measured.",
-          "matters": "The measurement is a fingerprint of the code: changed firmware gives a different fingerprint."
+          "plain": "Tile 3’s complete firmware is hashed so that it can be measured.",
+          "matters": "The measurement is a cryptographic fingerprint of the entire firmware image: any modification gives a different fingerprint."
         }
       ]
     },
