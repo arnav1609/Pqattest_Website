@@ -497,7 +497,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     }
   }
   let last = performance.now(), hbT = 0;
-  function frame(now: number) { requestAnimationFrame(frame); if (document.hidden) { last = now; return; } const dt = Math.min(now - last, 80); last = now;
+  function frame(now: number) { requestAnimationFrame(frame); if (document.hidden || !host.clientWidth || !host.clientHeight) { last = now; return; } const dt = Math.min(now - last, 80); last = now;
     if (tw.on) { tw.t = Math.min(1, tw.t + dt / 1000); const e = 1 - Math.pow(1 - tw.t, 4); cam.position.lerpVectors(tw.p0, tw.p1, e); ctl.target.lerpVectors(tw.g0, tw.g1, e); dirty = camMoved = true; if (tw.t >= 1) { tw.on = false; ctl.enabled = true; } }
     if (!reduce) { hbT += dt; if (hbT >= 335) { hbT = 0; ledOn[3] = !ledOn[3]; paintLeds(); } }
     animating = false; glow.forEach((o) => { if (Math.abs(o.t - o.g) > 0.004) { o.g += (o.t - o.g) * Math.min(1, dt * 0.008); o.ms.forEach((m) => { m.emissiveIntensity = o.g * 0.5; }); animating = true; } });

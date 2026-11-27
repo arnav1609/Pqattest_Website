@@ -624,9 +624,9 @@ function route() { if (writing) return; const [name, a, b] = (location.hash || '
   }
   if (name === 'inspect') {
     $<HTMLSelectElement>('#view').value = 'top';
-    api?.setView('top');
+    api?.setView('top',true);
     history.replaceState(null, '', '#explore');
-    $('#stage').scrollIntoView({block:'center', behavior: reduce ? 'instant' : 'smooth'});
+    $('#stage').scrollIntoView({block:'center', behavior: 'instant'});
   }
   const i = scenarios.findIndex((s) => s.id === a); if (i >= 0 && i !== st.sc) { st.sc = i; seek(0, false); } if (b !== undefined || st.sel) select(b ?? null, true); }
 window.addEventListener('hashchange', route);

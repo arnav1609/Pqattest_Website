@@ -69,3 +69,34 @@ b.ops.object.camera_add(location=(2.25,-6.5,2.65));cam=b.context.object;aim(cam,
 scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=False;scene.render.resolution_x=1080;scene.render.resolution_y=640;scene.render.resolution_percentage=100;scene.render.image_settings.file_format='WEBP';scene.render.image_settings.quality=85
 for name,angle in [('room',1.05),('welcome',.35)]:
  pivot.rotation_euler.z=angle;scene.render.filepath=str(Path(__file__).resolve().parents[1]/'src/assets'/f'{name}.webp');b.ops.render.render(write_still=True)
+
+# Sample the physical camera path into a compact filmstrip for offline and web playback.
+import tempfile, subprocess
+from mathutils import Quaternion
+out=Path(__file__).resolve().parents[1]/'src/assets'
+start=cam.location.copy()
+start_rot=cam.rotation_euler.to_quaternion()
+end=Vector((1,-1.1,2.82))
+end_rot=Quaternion((1,0,0),0)
+pivot.rotation_euler.z=1.05
+scene.render.resolution_x=480;scene.render.resolution_y=284
+scene.cycles.samples=6
+with tempfile.TemporaryDirectory() as directory:
+ for index in range(25):
+  u=index/24
+  t=u*u*(3-2*u)
+  cam.location=start.lerp(end,t)
+  cam.location.z+=.75*math.sin(math.pi*t)
+  cam.rotation_euler=start_rot.slerp(end_rot,t).to_euler()
+  scene.render.filepath=f'{directory}/{index:02}.webp'
+  b.ops.render.render(write_still=True)
+ subprocess.run(['montage',*[f'{directory}/{i:02}.webp' for i in range(25)],'-tile','5x5','-geometry','+0+0','-quality','84',str(out/'flight.webp')],check=True)
+
+cam.location=start;cam.rotation_euler=start_rot.to_euler()
+with tempfile.TemporaryDirectory() as directory:
+ for index in range(12):
+  u=index/11
+  pivot.rotation_euler.z=1.05-.70*u*u*(3-2*u)
+  scene.render.filepath=f'{directory}/{index:02}.webp'
+  b.ops.render.render(write_still=True)
+ subprocess.run(['montage',*[f'{directory}/{i:02}.webp' for i in range(12)],'-tile','4x3','-geometry','+0+0','-quality','78',str(out/'turn.webp')],check=True)
