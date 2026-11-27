@@ -1,7 +1,5 @@
-import room from './assets/room.webp';
-import turn from './assets/turn.webp';
-import flight from './assets/flight.webp';
-import welcome from './assets/welcome.webp';
+import room from './assets/cleanroom-photo.webp';
+import die from './assets/die-top.webp';
 import './cleanroom.css';
 
 const chapters = [
@@ -12,84 +10,73 @@ const chapters = [
 export function mountRoom() {
  const section=document.createElement('section');section.id='cleanroom';
  document.querySelector('main')!.prepend(section);
- section.innerHTML=`<div class="room-title"><p class="eyebrow">PQ-ATTEST / CONCEPT CLEANROOM</p><h1>Inside PQ-Attest</h1><p>Meet the engineer or step inside the six-tile chip.</p></div><div class="room-frame"><img class="room-base" alt="A suited engineer beside a lithography tool and a chip on an inspection bench"><img class="room-turn" alt=""><button class="room-person">Meet the engineer</button><a class="room-chip" href="#inspect">Explore the chip ↗</a></div>`;
+ section.innerHTML=`<div class="room-title"><p class="eyebrow">PQ-ATTEST / CONCEPT CLEANROOM</p><h1>Inside PQ-Attest</h1><p>Meet the engineer or step inside the six-tile chip.</p></div><div class="room-frame"><img class="room-base" alt="A suited engineer beside a lithography tool and a chip on an inspection bench"><img class="tray-die" alt=""><span class="room-marker" aria-hidden="true"></span><button class="room-person">Meet the engineer</button><a class="room-chip" href="#inspect">Explore the chip ↗</a></div>`;
  const frame=section.querySelector<HTMLElement>('.room-frame')!;
  section.querySelector<HTMLImageElement>('.room-base')!.src=room;
- section.querySelector<HTMLImageElement>('.room-turn')!.src=welcome;
- const flightFrames = new Image();
- let entering = false;
- const chip = frame.querySelector<HTMLAnchorElement>('.room-chip')!;
- chip.addEventListener('click', async event => {
-   if (event.metaKey || event.ctrlKey || event.shiftKey || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-   event.preventDefault();
-   if (entering) return;
-   entering = true;
-   const startBox = frame.getBoundingClientRect();
-   location.hash = 'inspect';
-   const canvas = document.createElement('canvas');
-   canvas.width = 480;
-   canvas.height = 284;
-   canvas.className = 'flight-frame';
-   canvas.setAttribute('aria-hidden', 'true');
-   try {
-     flightFrames.src = flight;
-     await flightFrames.decode();
-     if (!['#explore','#inspect'].includes(location.hash)) return;
-     const ctx = canvas.getContext('2d');
-     if (!ctx) return;
-     Object.assign(canvas.style,{position:'fixed',top:startBox.top+'px',left:startBox.left+'px',width:startBox.width+'px',height:startBox.height+'px',zIndex:'40'});
-     document.body.append(canvas);
-     const target=document.querySelector('#stage')!.getBoundingClientRect();
-     canvas.animate([{transform:'none'},{transform:`translate(${target.x-startBox.x}px,${target.y-startBox.y}px) scale(${target.width/startBox.width},${target.height/startBox.height})`}],{duration:960,fill:'forwards',easing:'ease-in-out'});
-     const start = performance.now();
-     await new Promise<void>(resolve => {
-       function draw(now: number) {
-         const index = Math.min(24, Math.floor((now - start) / 40));
-         ctx!.drawImage(flightFrames, index % 5 * 480, Math.floor(index / 5) * 284, 480, 284, 0, 0, 480, 284);
-         if (index === 24 || !['#inspect','#explore'].includes(location.hash)) resolve();
-         else requestAnimationFrame(draw);
+ const photo=frame.querySelector<HTMLImageElement>('.room-base')!;
+ const tile=frame.querySelector<HTMLImageElement>('.tray-die')!;
+ tile.src=die;
+ let entering=false;
+ // Coordinates measured on the 1536 by 1024 opening photograph.
+ const anchor={x:769/1536,y:677/1024};
+ function pose(flat:number,zoom:number) {
+   const w=frame.clientWidth,h=frame.clientHeight;
+   const side=w*.065;
+   const xAxis=[side*(1-flat)+side*flat, h*.006*(1-flat)];
+   const yAxis=[-w*.028*(1-flat),h*.045*(1-flat)+side*.68*flat];
+   const x=anchor.x*w, y=anchor.y*h;
+   tile.style.transform=`matrix(${xAxis[0]*zoom/400},${xAxis[1]*zoom/400},${yAxis[0]*zoom/272},${yAxis[1]*zoom/272},${x-zoom*(xAxis[0]+yAxis[0])/2},${y-zoom*(xAxis[1]+yAxis[1])/2})`;
+ }
+ const observer=new ResizeObserver(()=>{if(!entering)pose(0,1)});
+ observer.observe(frame);
+ const chip=frame.querySelector<HTMLAnchorElement>('.room-chip')!;
+ chip.onclick=async e=>{
+   if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+   e.preventDefault();
+   if(entering)return;
+   entering=true;
+   if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+     frame.classList.add('entering');
+     const start=performance.now();
+     const smooth=(n:number)=>{const t=Math.min(1,Math.max(0,n));return t*t*(3-2*t)};
+     await new Promise<void>(resolve=>{
+       function draw(now:number){
+         if(section.hidden||!section.isConnected){resolve();return;}
+         const elapsed=now-start;
+         const zoom=1+5*smooth(elapsed/2050);
+         const tilt=smooth((elapsed-1650)/2650);
+         photo.style.transform=`scale(${zoom})`;
+         photo.style.opacity=String(1-tilt);
+         pose(tilt,zoom);
+         if(elapsed<3050)requestAnimationFrame(draw);else resolve();
        }
        draw(start);
      });
-   } catch { /* The normal explorer route also works without the filmstrip. */ }
-   finally {
-     if (canvas.isConnected) await canvas.animate([{opacity:1},{opacity:0}],{duration:180}).finished;
-     entering = false;
-     requestAnimationFrame(() => canvas.remove());
    }
- });
+   if(section.isConnected&&!section.hidden){
+     // Keep the final overhead frame visible while routing and positioning the live camera.
+     const box=frame.getBoundingClientRect();
+     const veil=frame.cloneNode(true) as HTMLElement;
+     veil.querySelectorAll('button,a').forEach(e=>e.remove());
+     veil.setAttribute('aria-hidden','true');
+     Object.assign(veil.style,{position:'fixed',left:box.left+'px',top:box.top+'px',width:box.width+'px',height:box.height+'px',margin:'0',zIndex:'35',pointerEvents:'none'});
+     document.body.append(veil);
+     window.addEventListener('hashchange',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
+       veil.animate([{opacity:1},{opacity:0}],{duration:540,easing:'ease-in-out'}).finished.then(()=>veil.remove());
+     })),{once:true});
+     location.replace('#inspect');
+   }
+ };
  const dlg=document.createElement('dialog');dlg.className='room-guide';dlg.setAttribute('aria-labelledby','guide-title');document.body.append(dlg);
  function chapter(i:number){const [label,title,first,second,action,href]=chapters[i];
  dlg.innerHTML=`<button class="room-close" aria-label="Close guide">×</button><p class="eyebrow">ENGINEER’S GUIDE</p><nav aria-label="Guide chapters">${chapters.map(([name],j)=>`<button data-chapter="${j}" aria-pressed="${j===i}">${name}</button>`).join('')}</nav><p class="eyebrow">${label}</p><h2 id="guide-title" tabindex="-1">${title}</h2><p>${first}</p><p>${second}</p><a href="${href}">${action} →</a>`;
  dlg.querySelector('h2')!.focus();}
  dlg.onclick=(e)=>{const el=e.target as HTMLElement;if(el.dataset.chapter!==undefined)chapter(Number(el.dataset.chapter));else if(el.closest('a,.room-close')||el===dlg)dlg.close();};
- const turning = new Image();
- async function turnToVisitor(){
-   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-   turning.src = turn;
-   try { await turning.decode(); } catch { return; }
-   if (!dlg.open) return;
-   const canvas = document.createElement('canvas');
-   canvas.className = 'engineer-turn';
-   canvas.width = 480;
-   canvas.height = 284;
-   const ctx = canvas.getContext('2d');
-   if (!ctx) return;
-   frame.append(canvas);
-   const start = performance.now();
-   function draw(now:number){
-     const index = Math.min(11, Math.floor((now-start)/38));
-     ctx!.drawImage(turning,index%4*480,Math.floor(index/4)*284,480,284,0,0,480,284);
-     if (dlg.open && index < 11) requestAnimationFrame(draw);
-     else canvas.remove();
-   }
-   draw(start);
- }
  function open(){
    frame.classList.add('welcoming');
    chapter(0);
    dlg.showModal();
-   void turnToVisitor();
+
  }
  function navigate(){
    dlg.innerHTML = `<button class="room-close" aria-label="Close guide">×</button>
@@ -102,7 +89,13 @@ export function mountRoom() {
  }
  dlg.onclose=()=>frame.classList.remove('welcoming');
  section.querySelector('.room-person')!.addEventListener('click',open);
+ frame.addEventListener('click',e=>{
+   if(entering || (e.target as Element).closest('a,button'))return;
+   const box=frame.getBoundingClientRect(), x=(e.clientX-box.left)/box.width, y=(e.clientY-box.top)/box.height;
+   if(x>.43 && x<.58 && y>.61 && y<.72)chip.click();
+   else if(x>.19 && x<.36 && y>.25 && y<.93)open();
+ });
  const guide=document.createElement('button');guide.textContent='Engineer guide';document.querySelector('#nav')!.append(guide);guide.onclick=navigate;
- return (active:boolean)=>{section.hidden=!active;if(active&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{if(sessionStorage.getItem('room-seen'))return;sessionStorage.setItem('room-seen','1');}catch{return;}
- const cloud=document.createElement('div');cloud.className='cloud-curtain';cloud.innerHTML='<i></i><i></i><button>Skip intro</button>';document.body.append(cloud);cloud.onclick=()=>cloud.remove();setTimeout(()=>cloud.remove(),1150);}};
+ return (active:boolean)=>{section.hidden=!active;if(!active){observer.disconnect();section.remove();return;}if(active&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{if(sessionStorage.getItem('room-seen'))return;sessionStorage.setItem('room-seen','1');}catch{return;}
+ const cloud=document.createElement('div');cloud.className='cloud-curtain';cloud.innerHTML='<i></i><i></i><button>Skip intro</button>';document.body.append(cloud);cloud.onclick=()=>cloud.remove();setTimeout(()=>cloud.remove(),2650);}};
 }

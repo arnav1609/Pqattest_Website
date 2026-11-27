@@ -587,11 +587,19 @@ async function devBlock() { if (__PUBLIC_SAFE__) return; const el = document.get
   el.innerHTML = `<h2>Development metadata (not in public builds)</h2><pre class="mono">${esc(JSON.stringify(dev, null, 1))}</pre>`; }
 
 // ---------------------------------------------------------------- hash routes
+let introComplete = false;
+try { introComplete = sessionStorage.getItem('pq-entered') === '1'; } catch { /* private browsing */ }
 const displayRoom = mountRoom();
 let writing = false, disposeHow: (() => void) | null = null;
 function writeHash() { if ((location.hash.split('/')[0] || '#explore') !== '#explore') return; const h = `#explore/${scn().id}${st.sel ? '/' + st.sel : ''}`; if (location.hash !== h) { writing = true; try { history.replaceState(null, '', h); } catch { /* sandboxed viewers may refuse */ } writing = false; } }
-function route() { if (writing) return; const [name, a, b] = (location.hash || '#cleanroom').slice(1).split('/'); const page = PAGES[name] as (() => string) | undefined;
-  const inRoom = name === 'cleanroom'; displayRoom(inRoom); $('#explore').hidden = !!page || inRoom; $('#page').hidden = !page;
+function route() { if (writing) return; const [requested, a, b] = location.hash.slice(1).split('/');
+  const name = !requested && !introComplete ? 'intro' : requested === 'cleanroom' || !requested ? 'explore' : requested;
+  if (name !== 'intro' || requested) {
+    introComplete = true;
+    try { sessionStorage.setItem('pq-entered','1'); } catch { /* memory still covers this visit */ }
+    if (!requested || requested === 'cleanroom') history.replaceState(null,'','#explore');
+  } const page = PAGES[name] as (() => string) | undefined;
+  const inRoom = name === 'intro' && !requested && !introComplete; displayRoom(inRoom); $('#explore').hidden = !!page || inRoom; $('#page').hidden = !page;
   document.querySelectorAll('#nav a').forEach((l) => l.setAttribute('aria-current', String(l.getAttribute('href') === '#' + (page || inRoom ? name : 'explore') ? 'page' : 'false')));
   disposeHow?.(); disposeHow = null;
   if (inRoom) {stopTour(); st.playing=false; return;}
