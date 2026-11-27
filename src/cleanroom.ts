@@ -60,25 +60,51 @@ export function mountRoom(enterExplorer: () => DOMRect | undefined, finishEntran
    const destination = canvas.getBoundingClientRect();
    const a = tray.a * 400 / dieRect.width, b = tray.b * 400 / dieRect.width;
    const c = tray.c * 272 / dieRect.height, d = tray.d * 272 / dieRect.height;
-   const x = source.x + tray.e - a*dieRect.x - c*dieRect.y;
-   const y = source.y + tray.f - b*dieRect.x - d*dieRect.y;
+   const centerX = dieRect.x + dieRect.width / 2;
+   const centerY = dieRect.y + dieRect.height / 2;
+   const trayX = source.x + tray.e + tray.a * 200 + tray.c * 136;
+   const trayY = source.y + tray.f + tray.b * 200 + tray.d * 136;
+   const toX = destination.left + centerX - trayX;
+   const toY = destination.top + centerY - trayY;
    const surface = document.createElement('div');
    Object.assign(surface.style,{position:'absolute',left:'0',top:'0',width:destination.width+'px',
-     height:destination.height+'px',transformOrigin:'0 0',background:getComputedStyle(document.querySelector('#stage')!).backgroundImage+', var(--charcoal)'});
+     height:destination.height+'px',transformOrigin:`${centerX}px ${centerY}px`,background:getComputedStyle(document.querySelector('#stage')!).backgroundImage+', var(--charcoal)'});
    const parent = canvas.parentNode!;
    const next = canvas.nextSibling;
    const style = canvas.style.cssText;
    Object.assign(canvas.style,{display:'block',width:'100%',height:'100%'});
    surface.append(canvas);
    layer.append(surface);
-   layer.style.background='transparent';
-   const timing = {duration:820,easing:'cubic-bezier(.23,.68,.26,1)',fill:'both' as FillMode};
+   const zoom = Math.min(2.05, Math.max(1.18, .85 / a));
+   const pan = .32;
+   const timing = {duration:2280, fill:'both' as FillMode};
+   const approachEnd = 1060 / timing.duration;
+   const liftEnd = 2120 / timing.duration;
+   const travel = 'cubic-bezier(.34,0,.68,.76)';
+   const settle = 'cubic-bezier(.29,.42,.23,1)';
    const crop = `inset(${dieRect.top}px ${destination.width-dieRect.right}px ${destination.height-dieRect.bottom}px ${dieRect.left}px)`;
+   const trayPose = (scale:number, progress:number) =>
+     `translate(${trayX-centerX+toX*progress}px,${trayY-centerY+toY*progress}px) matrix(${a*scale},${b*scale},${c*scale},${d*scale},0,0)`;
+   const overhead = `translate(${destination.left}px,${destination.top}px) matrix(1,0,0,1,0,0)`;
    const motion = surface.animate([
-     {transform:`matrix(${a},${b},${c},${d},${x},${y})`, clipPath:crop},
-     {transform:`translate(${destination.left}px,${destination.top}px)`, clipPath:'inset(0px 0px 0px 0px)'}
+     {offset:0, transform:trayPose(1,0), clipPath:crop, easing:travel},
+     {offset:approachEnd, transform:trayPose(zoom,pan), clipPath:crop, easing:settle},
+     {offset:liftEnd, transform:overhead, clipPath:crop, easing:'ease-out'},
+     {offset:1, transform:overhead, clipPath:'inset(0px 0px 0px 0px)'}
    ],timing);
-   background.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.22)',opacity:0}],timing);
+   // Lock the photographic tray and projected chip together during the push-in.
+   background.style.transformOrigin = `${trayX-source.x}px ${trayY-source.y}px`;
+   const roomPose = (scale:number, progress:number) =>
+     `translate(${toX*progress}px,${toY*progress}px) scale(${scale})`;
+   background.animate([
+     {offset:0, transform:roomPose(1,0), opacity:1, easing:travel},
+     {offset:approachEnd, transform:roomPose(zoom,pan), opacity:1, easing:settle},
+     {offset:liftEnd, transform:roomPose(zoom*1.15,1), opacity:0},
+     {offset:1, transform:roomPose(zoom*1.15,1), opacity:0}
+   ],timing);
+   const charcoal = getComputedStyle(layer).backgroundColor;
+   layer.animate([{backgroundColor:charcoal}, {offset:liftEnd,backgroundColor:charcoal},
+     {backgroundColor:'transparent'}],timing);
    try {await motion.finished;} finally {
      canvas.style.cssText=style;
      parent.insertBefore(canvas,next);
@@ -115,6 +141,6 @@ export function mountRoom(enterExplorer: () => DOMRect | undefined, finishEntran
    else if(x>.19 && x<.36 && y>.25 && y<.93)open();
  });
  const guide=document.createElement('button');guide.textContent='Engineer guide';document.querySelector('#nav')!.append(guide);guide.onclick=navigate;
- return (active:boolean)=>{document.body.classList.toggle('intro-only',active);section.hidden=!active;if(!active){observer.disconnect();section.remove();return;}if(active&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{if(sessionStorage.getItem('room-seen'))return;sessionStorage.setItem('room-seen','1');}catch{return;}
- const cloud=document.createElement('div');cloud.className='cloud-curtain';cloud.innerHTML='<i></i><i></i>';document.body.append(cloud);cloud.setAttribute('aria-hidden','true');setTimeout(()=>cloud.remove(),2650);}};
+ return (active:boolean)=>{document.body.classList.toggle('intro-only',active);section.hidden=!active;if(!active){observer.disconnect();section.remove();document.querySelector('.cloud-curtain')?.remove();return;}if(active&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{if(sessionStorage.getItem('room-seen'))return;sessionStorage.setItem('room-seen','1');}catch{return;}
+ const cloud=document.createElement('div');cloud.className='cloud-curtain';cloud.innerHTML='<i></i><i></i>';document.body.append(cloud);cloud.setAttribute('aria-hidden','true');cloud.addEventListener('animationend',()=>cloud.remove(),{once:true});}};
 }
