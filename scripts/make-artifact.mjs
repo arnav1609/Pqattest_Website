@@ -14,8 +14,8 @@ css = css.replace(/,\s*url\([^)]*\.woff\)\s*format\(["']woff["']\)/g, '')       
 if (/url\((?!data:)/.test(css)) throw new Error('a CSS url() was not inlined');
 if (js.includes('import(') && /import\(["']\.\//.test(js)) throw new Error('the bundle has a dynamic chunk; build with PUBLIC_SAFE on');
 const html = readFileSync(new URL('index.html', dist), 'utf8');
-const body = html.slice(html.indexOf('<body>') + 6, html.indexOf('</body>')).replace(/<script[\s\S]*?<\/script>/g, '').trim();
-const page = `<meta charset="utf-8"><title>PQ-Attest SoC Explorer</title>
+const body = html.slice(html.indexOf('<body'), html.indexOf('</body>')).replace(/<script[\s\S]*?<\/script>/g, '').trim();
+const page = `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"><title>PQ-Attest SoC Explorer</title>
 <style>${css}</style>
 ${body}
 <script type="module">${js.replace(/<\/script/g, '<\\/script')}</script>

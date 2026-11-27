@@ -8,9 +8,9 @@ const chapters = [
   ['The tests', 'What happened at the gate?', 'The walkthroughs show a trusted processor accessing memory, an untrusted processor being stopped locally, and permission being revoked. A local refusal ends at the sending tile.', 'The results page ties measurements to the build that produced them. The forged-packet test belongs to simulation; the corresponding external port is tied off in the board image.', 'See measured results', '#results']
 ];
 export function mountRoom() {
- const section=document.createElement('section');section.id='cleanroom';
+ const section=document.createElement('section');section.id='cleanroom';section.setAttribute('aria-label','PQ-Attest cleanroom introduction');
  document.querySelector('main')!.prepend(section);
- section.innerHTML=`<div class="room-title"><p class="eyebrow">PQ-ATTEST / CONCEPT CLEANROOM</p><h1>Inside PQ-Attest</h1><p>Meet the engineer or step inside the six-tile chip.</p></div><div class="room-frame"><img class="room-base" alt="A suited engineer beside a lithography tool and a chip on an inspection bench"><img class="tray-die" alt=""><span class="room-marker" aria-hidden="true"></span><button class="room-person">Meet the engineer</button><a class="room-chip" href="#inspect">Explore the chip ↗</a></div>`;
+ section.innerHTML=`<div class="room-frame"><img class="room-base" alt="A suited engineer beside a lithography tool and a chip on an inspection bench"><img class="tray-die" alt=""><span class="room-marker" aria-hidden="true"></span><button class="room-person">Meet the engineer</button><a class="room-chip" href="#inspect">Explore the chip ↗</a></div>`;
  const frame=section.querySelector<HTMLElement>('.room-frame')!;
  section.querySelector<HTMLImageElement>('.room-base')!.src=room;
  const photo=frame.querySelector<HTMLImageElement>('.room-base')!;
@@ -44,32 +44,46 @@ export function mountRoom() {
          if(section.hidden||!section.isConnected){resolve();return;}
          const elapsed=now-start;
          const zoom=1+5*smooth(elapsed/2050);
-         const tilt=smooth((elapsed-1650)/2650);
+         const tilt=smooth((elapsed-1250)/1500);
          photo.style.transform=`scale(${zoom})`;
          photo.style.opacity=String(1-tilt);
          pose(tilt,zoom);
-         if(elapsed<3050)requestAnimationFrame(draw);else resolve();
+         if(elapsed<2800)requestAnimationFrame(draw);else resolve();
        }
        draw(start);
      });
    }
    if(section.isConnected&&!section.hidden){
-     // Keep the final overhead frame visible while routing and positioning the live camera.
-     const box=frame.getBoundingClientRect();
-     const veil=frame.cloneNode(true) as HTMLElement;
-     veil.querySelectorAll('button,a').forEach(e=>e.remove());
-     veil.setAttribute('aria-hidden','true');
-     Object.assign(veil.style,{position:'fixed',left:box.left+'px',top:box.top+'px',width:box.width+'px',height:box.height+'px',margin:'0',zIndex:'35',pointerEvents:'none'});
-     document.body.append(veil);
-     window.addEventListener('hashchange',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
-       veil.animate([{opacity:1},{opacity:0}],{duration:540,easing:'ease-in-out'}).finished.then(()=>veil.remove());
-     })),{once:true});
+     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+       // Reveal the already-rendered canvas through an expanding aperture.
+       // Keep both surfaces opaque to avoid double exposure at handoff.
+       const box=frame.getBoundingClientRect();
+       const veil=document.createElement('div');
+       veil.className='chip-handoff';
+       veil.setAttribute('aria-hidden','true');
+       const still=tile.cloneNode() as HTMLImageElement;
+       Object.assign(still.style,{position:'absolute',left:box.left+'px',top:box.top+'px',width:'400px',height:'272px',transformOrigin:'0 0'});
+       veil.append(still);document.body.append(veil);
+       window.addEventListener('hashchange',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
+         const stage=document.querySelector('#stage canvas')?.getBoundingClientRect() ?? document.querySelector('#stage')!.getBoundingClientRect();
+         const start=still.getBoundingClientRect();
+         const targetWidth=stage.height*.99*(stage.width<560?.52:1);
+         const dx=stage.left+stage.width/2-start.left-start.width/2;
+         const dy=stage.top+stage.height/2-start.top-start.height/2;
+         const wrap=document.createElement('div');
+         Object.assign(wrap.style,{position:'absolute',left:start.left+'px',top:start.top+'px',width:start.width+'px',height:start.height+'px'});
+         still.removeAttribute('style');Object.assign(still.style,{width:'100%',height:'100%',display:'block'});
+         veil.append(wrap);wrap.append(still);
+         wrap.animate([{transform:'none'},{transform:`translate(${dx}px,${dy}px) scale(${targetWidth/start.width})`}],{duration:550,easing:'ease-in-out',fill:'forwards'});
+         veil.animate([{clipPath:'inset(0 0 0 0)'},{clipPath:'inset(0 0 100% 0)'}],{delay:550,duration:320,easing:'ease-in-out',fill:'forwards'}).finished.then(()=>veil.remove());
+       })),{once:true});
+     }
      location.replace('#inspect');
    }
  };
  const dlg=document.createElement('dialog');dlg.className='room-guide';dlg.setAttribute('aria-labelledby','guide-title');document.body.append(dlg);
  function chapter(i:number){const [label,title,first,second,action,href]=chapters[i];
- dlg.innerHTML=`<button class="room-close" aria-label="Close guide">×</button><p class="eyebrow">ENGINEER’S GUIDE</p><nav aria-label="Guide chapters">${chapters.map(([name],j)=>`<button data-chapter="${j}" aria-pressed="${j===i}">${name}</button>`).join('')}</nav><p class="eyebrow">${label}</p><h2 id="guide-title" tabindex="-1">${title}</h2><p>${first}</p><p>${second}</p><a href="${href}">${action} →</a>`;
+ dlg.innerHTML=`<button class="room-close" aria-label="Close guide">×</button><p class="eyebrow">ENGINEER’S GUIDE</p><nav aria-label="Guide chapters">${chapters.map(([name],j)=>`<button data-chapter="${j}" aria-pressed="${j===i}">${name}</button>`).join('')}</nav><p class="eyebrow">${label}</p><h2 id="guide-title" tabindex="-1">${title}</h2><p>${first}</p><p>${second}</p>${section.isConnected ? '' : `<a href="${href}">${action} →</a>`}`;
  dlg.querySelector('h2')!.focus();}
  dlg.onclick=(e)=>{const el=e.target as HTMLElement;if(el.dataset.chapter!==undefined)chapter(Number(el.dataset.chapter));else if(el.closest('a,.room-close')||el===dlg)dlg.close();};
  function open(){
@@ -96,6 +110,6 @@ export function mountRoom() {
    else if(x>.19 && x<.36 && y>.25 && y<.93)open();
  });
  const guide=document.createElement('button');guide.textContent='Engineer guide';document.querySelector('#nav')!.append(guide);guide.onclick=navigate;
- return (active:boolean)=>{section.hidden=!active;if(!active){observer.disconnect();section.remove();return;}if(active&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{if(sessionStorage.getItem('room-seen'))return;sessionStorage.setItem('room-seen','1');}catch{return;}
- const cloud=document.createElement('div');cloud.className='cloud-curtain';cloud.innerHTML='<i></i><i></i><button>Skip intro</button>';document.body.append(cloud);cloud.onclick=()=>cloud.remove();setTimeout(()=>cloud.remove(),2650);}};
+ return (active:boolean)=>{document.body.classList.toggle('intro-only',active);section.hidden=!active;if(!active){observer.disconnect();section.remove();return;}if(active&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{if(sessionStorage.getItem('room-seen'))return;sessionStorage.setItem('room-seen','1');}catch{return;}
+ const cloud=document.createElement('div');cloud.className='cloud-curtain';cloud.innerHTML='<i></i><i></i>';document.body.append(cloud);cloud.setAttribute('aria-hidden','true');setTimeout(()=>cloud.remove(),2650);}};
 }

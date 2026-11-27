@@ -4,6 +4,10 @@ for (const width of [390,1440]) {
   test('one-way photo introduction at '+width, async ({ page }) => {
     await page.setViewportSize({width,height:900});
     await page.goto('/');
+    await expect(page.locator('#nav')).toBeHidden();
+    await expect(page.locator('a:visible,button:visible')).toHaveCount(2);
+    const bounds=await page.locator('#cleanroom').boundingBox();
+    expect(bounds).toEqual({x:0,y:0,width,height:900});
     await page.getByRole('button',{name:'Meet the engineer'}).click();
     await expect(page.getByRole('dialog')).toContainText('Who gets to use shared memory?');
     await page.getByRole('button',{name:'The tests',exact:true}).click();
