@@ -70,7 +70,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
 
   // light: a studio environment for reflections, one shadow-casting key light, a cool fill
   { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; pm.dispose(); }
-  scene.environmentIntensity = 0.55;
+  scene.environmentIntensity = 0.68;
   scene.add(new THREE.HemisphereLight(0xf2ead8, 0x15181c, 0.35));
   const key = new THREE.DirectionalLight(0xfff1dc, 2.6); key.position.set(52, 96, 40); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
   Object.assign(key.shadow.camera, { left: -90, right: 90, top: 62, bottom: -62, near: 20, far: 260 }); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02; key.shadow.radius = 4; scene.add(key);
@@ -79,7 +79,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
 
   // materials
   const nTex = tex(noise, false, 3, 3);
-  const mold = (color: number) => new THREE.MeshPhysicalMaterial({ color, roughness: 0.62, roughnessMap: nTex, metalness: 0, clearcoat: 0.22, clearcoatRoughness: 0.55, emissive: C.blue, emissiveIntensity: 0 });
+  const mold = (color: number) => new THREE.MeshPhysicalMaterial({ color, roughness: 0.62, roughnessMap: nTex, metalness: 0, clearcoat: 0.15, clearcoatRoughness: 0.55, emissive: C.blue, emissiveIntensity: 0 });
   const ceramic = () => new THREE.MeshPhysicalMaterial({ color: 0xe4d8c0, roughness: 0.72, roughnessMap: nTex, metalness: 0, sheen: 0.3, emissive: C.blue, emissiveIntensity: 0 });
   const goldM = new THREE.MeshStandardMaterial({ color: 0xd9b56c, roughness: 0.26, metalness: 1 });
   const goldLid = () => new THREE.MeshStandardMaterial({ color: 0xd4b06a, roughness: 0.3, roughnessMap: nTex, metalness: 1, emissive: C.blue, emissiveIntensity: 0 });
@@ -347,11 +347,12 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   // ------------------------------------------------------------------ packets: a pure function of (event, progress), so seeking cannot leave stale state
   let animating = false;
   function showEvent(ev: Ev | null, t: number) { (Object.keys(flits) as VcId[]).forEach((k) => { flits[k].visible = false; }); ring3.visible = stop.visible = false; trail.visible = false; halo.intensity = 0; dirty = true;
-    if (!ev) return; const pa = paths.get(ev.id)!, f = flits[ev.vc], s = t * t * (3 - 2 * t), head = s * pa.tot, a = trailGeo.attributes.position as THREE.BufferAttribute;
+    if (!ev) return; const pa = paths.get(ev.id)!, f = flits[ev.vc], progress = THREE.MathUtils.clamp((t - 0.12) / 0.72, 0, 1), head = progress * pa.tot, a = trailGeo.attributes.position as THREE.BufferAttribute;
     pa.pts.forEach((p, i) => a.setXYZ(i, p.x, PY - 0.3, p.z)); a.needsUpdate = true; trailGeo.setDrawRange(0, pa.pts.length); trail.computeLineDistances(); [trailMat.dashSize, trailMat.gapSize] = DASH[ev.vc]; trail.visible = true;
-    for (let i = 0; i < NF; i++) { const dd = Math.max(0, head - i * 1.3); at(pa, dd, v1); at(pa, Math.min(pa.tot, dd + 0.4), v2); tmp.position.copy(v1); tmp.rotation.set(0, 0, 0); tmp.scale.set(1, 1, 1); if (v2.distanceToSquared(v1) > 1e-6) tmp.lookAt(v2); tmp.updateMatrix(); f.setMatrixAt(i, tmp.matrix); }
-    f.instanceMatrix.needsUpdate = true; f.visible = true; at(pa, head, halo.position); halo.position.y = PY + 0.4; halo.intensity = t < 1 ? 75 : 0;
-    if (t >= 1) {
+    for (let i = 0; i < NF; i++) { const dd = Math.max(0, head - i * 1.3); at(pa, dd, v1); at(pa, Math.min(pa.tot, dd + 0.4), v2); tmp.position.copy(v1); tmp.rotation.set(0, 0, 0); tmp.scale.setScalar(i === 0 ? 1.65 : 1 - i * 0.12); if (v2.distanceToSquared(v1) > 1e-6) tmp.lookAt(v2); tmp.updateMatrix(); f.setMatrixAt(i, tmp.matrix); }
+    f.instanceMatrix.needsUpdate = true; f.visible = true; at(pa, head, halo.position); halo.position.y = PY + 0.4; halo.intensity = 100 + 65 * Math.cos(progress * Math.PI * 2);
+    if (t < .12) {ring3.visible=true;ring3.position.copy(pa.pts[0]);ring3.scale.setScalar(1.4 - t * 4);}
+    if (progress >= 1) {
       const end = pa.pts[pa.pts.length - 1];
       if (ev.outcome === 'accepted') {
         ring3.position.set(end.x, PY - 0.2, end.z);
