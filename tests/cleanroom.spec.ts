@@ -12,7 +12,10 @@ for (const width of [390,1440]) {
     await expect(page.getByRole('dialog')).toContainText('Who gets to use shared memory?');
     await page.getByRole('button',{name:'The tests',exact:true}).click();
     await page.getByRole('button',{name:'Close guide'}).click();
+    const originalCanvas=await page.locator('#stage canvas').elementHandle();
     await page.locator('.room-chip').click();
+    await expect(page.locator('.chip-handoff')).toHaveCount(0,{timeout:5000});
+    if (originalCanvas) expect(await originalCanvas.evaluate(el=>el===document.querySelector('#stage canvas'))).toBe(true);
     await expect(page.locator('#view')).toHaveValue('top',{timeout:15000});
     await expect(page.locator('#cleanroom')).toHaveCount(0);
     await expect(page.locator('#nav a[href="#cleanroom"]')).toHaveCount(0);

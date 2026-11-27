@@ -589,7 +589,11 @@ async function devBlock() { if (__PUBLIC_SAFE__) return; const el = document.get
 // ---------------------------------------------------------------- hash routes
 let introComplete = false;
 try { introComplete = sessionStorage.getItem('pq-entered') === '1'; } catch { /* private browsing */ }
-const displayRoom = mountRoom();
+const displayRoom = mountRoom(() => {
+  history.replaceState(null, '', '#inspect');
+  route();
+  return api?.overheadDie();
+}, () => api?.finishEntrance());
 let writing = false, disposeHow: (() => void) | null = null;
 function writeHash() { if ((location.hash.split('/')[0] || '#explore') !== '#explore') return; const h = `#explore/${scn().id}${st.sel ? '/' + st.sel : ''}`; if (location.hash !== h) { writing = true; try { history.replaceState(null, '', h); } catch { /* sandboxed viewers may refuse */ } writing = false; } }
 function route() { if (writing) return; const [requested, a, b] = location.hash.slice(1).split('/');
@@ -602,7 +606,7 @@ function route() { if (writing) return; const [requested, a, b] = location.hash.
   const inRoom = name === 'intro' && !requested && !introComplete; displayRoom(inRoom); $('#explore').hidden = !!page || inRoom; $('#page').hidden = !page;
   document.querySelectorAll('#nav a').forEach((l) => l.setAttribute('aria-current', String(l.getAttribute('href') === '#' + (page || inRoom ? name : 'explore') ? 'page' : 'false')));
   disposeHow?.(); disposeHow = null;
-  if (inRoom) {stopTour(); st.playing=false; return;}
+  if (inRoom) {stopTour(); st.playing=false; requestAnimationFrame(() => { if (document.body.classList.contains('intro-only')) api?.warmEntrance(); }); return;}
   if (page) {
     stopTour();
     $('#page').innerHTML = page();

@@ -14,6 +14,9 @@ const PY = 2.3;
 
 export interface LedState { auth: boolean; led: string }
 export interface SceneApi {
+  warmEntrance(): void;
+  overheadDie(): DOMRect;
+  finishEntrance(): void;
   select(id: string | null): void; setFocus(ids: string[]): void; setView(name: string, instant?: boolean): void; stepCamera(dir: string): void;
   showEvent(ev: Ev | null, t: number): void; setLabels(on: boolean): void; setLogical(on: boolean): void; setLeds(s: LedState): void; focusTile(t: number | null, fly?: boolean): void;
   onPick(cb: (id: string | null) => void): void; onHover(cb: (id: string | null, x: number, y: number) => void): void;
@@ -377,7 +380,10 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   function setLeds(s: LedState) { ledOn[0] = s.auth; ledOn[2] = s.led === '0001'; ledOn[4] = s.led === '0010'; paintLeds(); }
   paintLeds();
 
-  function fit() { const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); cam.aspect = w / h; phone = w < 560; cam.fov = phone ? 44 : 34; cam.updateProjectionMatrix(); dirty = camMoved = true; }
+  let fittedWidth=0, fittedHeight=0;
+  let entranceActive=false;
+  function fit() { const w = host.clientWidth, h = host.clientHeight; if (!w || !h || (w===fittedWidth && h===fittedHeight)) return;
+    fittedWidth=w; fittedHeight=h; renderer.setSize(w, h, false); cam.aspect = w / h; phone = w < 560; cam.fov = phone ? 44 : 34; cam.updateProjectionMatrix(); dirty = camMoved = true; }
   new ResizeObserver(fit).observe(host); fit(); setView('home', true);
 
   const labelRay = new THREE.Raycaster();
@@ -497,7 +503,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     }
   }
   let last = performance.now(), hbT = 0;
-  function frame(now: number) { requestAnimationFrame(frame); if (document.hidden || !host.clientWidth || !host.clientHeight) { last = now; return; } const dt = Math.min(now - last, 80); last = now;
+  function frame(now: number) { requestAnimationFrame(frame); if (entranceActive || document.hidden || host.closest('[hidden]') || !host.clientWidth || !host.clientHeight) { last = now; return; } const dt = Math.min(now - last, 80); last = now;
     if (tw.on) { tw.t = Math.min(1, tw.t + dt / 1000); const e = 1 - Math.pow(1 - tw.t, 4); cam.position.lerpVectors(tw.p0, tw.p1, e); ctl.target.lerpVectors(tw.g0, tw.g1, e); dirty = camMoved = true; if (tw.t >= 1) { tw.on = false; ctl.enabled = true; } }
     if (!reduce) { hbT += dt; if (hbT >= 335) { hbT = 0; ledOn[3] = !ledOn[3]; paintLeds(); } }
     animating = false; glow.forEach((o) => { if (Math.abs(o.t - o.g) > 0.004) { o.g += (o.t - o.g) * Math.min(1, dt * 0.008); o.ms.forEach((m) => { m.emissiveIntensity = o.g * 0.5; }); animating = true; } });
@@ -508,7 +514,30 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   requestAnimationFrame(frame);
   void btnCaps;
 
-  return { ok: true, select, setView, stepCamera, showEvent, screenOf, pickAt, setLeds, focusTile,
+  let preparedWidth=0, preparedHeight=0;
+  function prepareOverhead() {
+    fit();
+    setView('top',true);
+    cam.updateMatrixWorld();
+    renderer.render(scene,cam);
+    preparedWidth=host.clientWidth;
+    preparedHeight=host.clientHeight;
+  }
+  function overheadDie() {
+    entranceActive=true;
+    if(preparedWidth!==host.clientWidth || preparedHeight!==host.clientHeight)prepareOverhead();
+    fit();
+    setView('top', true);
+    cam.updateMatrixWorld();
+    const { w, d } = g('die');
+    const corner = new THREE.Vector3(-w / 2, 0, -d / 2).project(cam);
+    const opposite = new THREE.Vector3(w / 2, 0, d / 2).project(cam);
+    const width = host.clientWidth, height = host.clientHeight;
+    return new DOMRect((1 + corner.x) * width / 2, (1 - corner.y) * height / 2,
+      (opposite.x - corner.x) * width / 2, (corner.y - opposite.y) * height / 2);
+  }
+
+  return { ok: true, overheadDie, warmEntrance: prepareOverhead, finishEntrance() { entranceActive=false; camMoved=dirty=true; }, select, setView, stepCamera, showEvent, screenOf, pickAt, setLeds, focusTile,
     setFocus(ids) { focus = ids; applyGlow(); },
     setLabels(on) { labelsOn = on; camMoved = true; },
     setLogical(on) { deco.visible = !on; dirty = true; },
