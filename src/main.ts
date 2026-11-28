@@ -1,3 +1,4 @@
+import { mountRoom } from './cleanroom';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/latin-500.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
@@ -333,6 +334,7 @@ function paint() {
       <span class="capmeta">${st.tour ? `Demo · part ${st.sc + 1} of ${scenarios.length}: ${esc(s.name)}` : esc(s.name)} · step ${st.ev + 1} of ${s.events.length}</span>
       ${outcomeBadge}
     </div>
+    <p class="transfer-route" aria-label="Transfer path">${e.path.map(id => esc(byId.get(id)?.name ?? id)).join(' → ')}</p>
     <p class="capwho">${esc(e.who)}</p>
     <p class="capwhat">${esc(e.plain)}</p>
     <p class="capwhy"><b>Why it matters:</b> ${esc(e.matters)}</p>`;
@@ -585,12 +587,26 @@ async function devBlock() { if (__PUBLIC_SAFE__) return; const el = document.get
   el.innerHTML = `<h2>Development metadata (not in public builds)</h2><pre class="mono">${esc(JSON.stringify(dev, null, 1))}</pre>`; }
 
 // ---------------------------------------------------------------- hash routes
+let introComplete = false;
+try { introComplete = sessionStorage.getItem('pq-entered') === '1'; } catch { /* private browsing */ }
+const displayRoom = mountRoom(() => {
+  history.replaceState(null, '', '#inspect');
+  route();
+  return api?.overheadDie();
+}, () => api?.finishEntrance());
 let writing = false, disposeHow: (() => void) | null = null;
 function writeHash() { if ((location.hash.split('/')[0] || '#explore') !== '#explore') return; const h = `#explore/${scn().id}${st.sel ? '/' + st.sel : ''}`; if (location.hash !== h) { writing = true; try { history.replaceState(null, '', h); } catch { /* sandboxed viewers may refuse */ } writing = false; } }
-function route() { if (writing) return; const [name, a, b] = (location.hash || '#explore').slice(1).split('/'); const page = PAGES[name] as (() => string) | undefined;
-  $('#explore').hidden = !!page; $('#page').hidden = !page;
-  document.querySelectorAll('#nav a').forEach((l) => l.setAttribute('aria-current', String(l.getAttribute('href') === '#' + (page ? name : 'explore') ? 'page' : 'false')));
+function route() { if (writing) return; const [requested, a, b] = location.hash.slice(1).split('/');
+  const name = !requested && !introComplete ? 'intro' : requested === 'cleanroom' || !requested ? 'explore' : requested;
+  if (name !== 'intro' || requested) {
+    introComplete = true;
+    try { sessionStorage.setItem('pq-entered','1'); } catch { /* memory still covers this visit */ }
+    if (!requested || requested === 'cleanroom') history.replaceState(null,'','#explore');
+  } const page = PAGES[name] as (() => string) | undefined;
+  const inRoom = name === 'intro' && !requested && !introComplete; displayRoom(inRoom); $('#explore').hidden = !!page || inRoom; $('#page').hidden = !page;
+  document.querySelectorAll('#nav a').forEach((l) => l.setAttribute('aria-current', String(l.getAttribute('href') === '#' + (page || inRoom ? name : 'explore') ? 'page' : 'false')));
   disposeHow?.(); disposeHow = null;
+  if (inRoom) {stopTour(); st.playing=false; requestAnimationFrame(() => { if (document.body.classList.contains('intro-only')) api?.warmEntrance(); }); return;}
   if (page) {
     stopTour();
     $('#page').innerHTML = page();
@@ -617,6 +633,12 @@ function route() { if (writing) return; const [name, a, b] = (location.hash || '
       });
     }
     st.playing = false; window.scrollTo(0, 0); main.focus({ preventScroll: true }); return;
+  }
+  if (name === 'inspect') {
+    $<HTMLSelectElement>('#view').value = 'top';
+    api?.setView('top',true);
+    history.replaceState(null, '', '#explore');
+    $('#stage').scrollIntoView({block:'center', behavior: 'instant'});
   }
   const i = scenarios.findIndex((s) => s.id === a); if (i >= 0 && i !== st.sc) { st.sc = i; seek(0, false); } if (b !== undefined || st.sel) select(b ?? null, true); }
 window.addEventListener('hashchange', route);
