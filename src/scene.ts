@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { build, byId, components, edges, fmt, scenarios, type Component, type Ev, type VcId } from './model';
+import { build, byId, components, edges, fmt, scenarios, tiles, type Component, type Ev, type VcId } from './model';
 
 // Coordinate system, declared once: +X = mesh x, +Z = mesh y (row y=1 is nearer the default camera), +Y = up.
 // Units are arbitrary; the die top is y = 0. Block footprints: area = LUT x build.areaConstant.
@@ -18,7 +18,7 @@ export interface SceneApi {
   overheadDie(): DOMRect;
   finishEntrance(): void;
   select(id: string | null): void; setFocus(ids: string[]): void; setView(name: string, instant?: boolean): void; stepCamera(dir: string): void;
-  showEvent(ev: Ev | null, t: number): void; setLabels(on: boolean): void; setLogical(on: boolean): void; setLeds(s: LedState): void; focusTile(t: number | null, fly?: boolean): void;
+  showEvent(ev: Ev | null, t: number): string; setLabels(on: boolean): void; setLogical(on: boolean): void; setLeds(s: LedState): void; focusTile(t: number | null, fly?: boolean): void;
   onPick(cb: (id: string | null) => void): void; onHover(cb: (id: string | null, x: number, y: number) => void): void;
   screenOf(id: string): { x: number; y: number } | null; pickAt(x: number, y: number): string | null; info(): { calls: number; triangles: number }; ok: boolean;
 }
@@ -68,7 +68,12 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   const cv = renderer.domElement; cv.setAttribute('aria-hidden', 'true'); host.prepend(cv);
   const scene = new THREE.Scene();
   const cam = new THREE.PerspectiveCamera(34, 1.6, 1, 900);
-  const ctl = new OrbitControls(cam, cv); ctl.enableDamping = true; ctl.dampingFactor = 0.09; ctl.minDistance = 12; ctl.maxDistance = 240; ctl.screenSpacePanning = true;
+  const ctl = new OrbitControls(cam, cv);
+  cv.style.touchAction = 'pan-y';
+  // A single finger scrolls the page. Two fingers manipulate the model.
+  ctl.touches.ONE = null;
+  ctl.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+  ctl.enableDamping = true; ctl.dampingFactor = 0.09; ctl.minDistance = 12; ctl.maxDistance = 240; ctl.screenSpacePanning = true;
   let dirty = true, camMoved = true; ctl.addEventListener('change', () => { dirty = camMoved = true; });
 
   // light: a studio environment for reflections, one shadow-casting key light, a cool fill
@@ -88,7 +93,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   const goldLid = () => new THREE.MeshStandardMaterial({ color: 0xd4b06a, roughness: 0.3, roughnessMap: nTex, metalness: 1, emissive: C.blue, emissiveIntensity: 0 });
   const tin = new THREE.MeshStandardMaterial({ color: 0xc9ccd0, roughness: 0.32, metalness: 1 });
   const steel = new THREE.MeshStandardMaterial({ color: 0xc3c6ca, roughness: 0.22, roughnessMap: nTex, metalness: 1 });
-  const traceM = new THREE.MeshStandardMaterial({ color: 0xd2b98a, roughness: 0.3, metalness: 1 });
+  const traceM = new THREE.MeshStandardMaterial({ color: 0x877a63, roughness: 0.68, metalness: 0.62 });
 
   const deco = new THREE.Group(); scene.add(deco);           // package and board (hidden in the logical view)
   const bd = new THREE.Group(); deco.add(bd);                // board and its parts (hidden when the camera is below the board)
@@ -134,8 +139,8 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   const catcher = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.ShadowMaterial({ opacity: 0.45 })); catcher.rotation.x = -Math.PI / 2; catcher.position.y = -3.72; catcher.receiveShadow = true; bd.add(catcher);
   const pkgM = put(deco, rbox(g('pkg').w, g('pkg').h, g('pkg').d, 0.45), new THREE.MeshPhysicalMaterial({ color: 0x343a2f, map: tex(routing, true, 10, 7), roughness: 0.55, clearcoat: 0.35, clearcoatRoughness: 0.4 }), 0, -0.5 - g('pkg').h / 2, 0);
   put(deco, rbox(61.4, 0.34, 41.4, 0.17), new THREE.MeshStandardMaterial({ color: 0x8a7d63, roughness: 0.85 }), 0, -0.5 + 0.12, 0, false);   // underfill fillet
-  const dieM = put(scene, rbox(g('die').w, g('die').h, g('die').d, 0.12), new THREE.MeshPhysicalMaterial({ color: 0x1a1f27, map: tex(cells, true, 26, 18), roughness: 0.2, metalness: 0.65,
-    iridescence: 0.22, iridescenceIOR: 1.5, iridescenceThicknessRange: [300, 420], clearcoat: 0.6, clearcoatRoughness: 0.12 }), 0, -g('die').h / 2, 0);
+  const dieM = put(scene, rbox(g('die').w, g('die').h, g('die').d, 0.12), new THREE.MeshPhysicalMaterial({ color: 0x1a1f27, map: tex(cells, true, 26, 18), roughness: 0.54, metalness: 0.48,
+    iridescence: 0.22, iridescenceIOR: 1.5, iridescenceThicknessRange: [300, 420], clearcoat: 0.18, clearcoatRoughness: 0.5 }), 0, -g('die').h / 2, 0);
   for (const [id, m] of [['board', boardM], ['pkg', pkgM], ['die', dieM]] as const) { m.userData = { id, top: m.position.y + 0.25 }; picks.push(m); mesh.set(id, m); }
   boardM.userData.top = -2.3; pkgM.userData.top = -0.5; dieM.userData.top = 0;
   // seal ring and pin-1 mark on the die, fiducials and the package pin-1 mark
@@ -241,10 +246,13 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
 
   // ------------------------------------------------------------------ labels (HTML, so they stay sharp)
   const labels: { id: string; el: HTMLElement; p: THREE.Vector3; minor: boolean; sub: boolean; shown: boolean; board?: boolean }[] = [];
+  const tileNames = new Map(tiles.map(tile => [tile.primary, `T${tile.id} · ${tile.name.replace('RISC-V ', '')}`]));
   let labelsOn = true, selected: string | null = null, phone = false;
   for (const c of components) { if (['board', 'package', 'die'].includes(c.type)) continue; const m = mesh.get(c.id)!;
     const el = document.createElement('div'); el.className = 'lab' + (c.type === 'router' || c.type === 'ni' ? ' minor' : c.type === 'sub' ? ' sub' : '');
-    el.textContent = c.type === 'router' ? c.id.toUpperCase() : c.type === 'ni' ? 'NI ' + c.tileId : c.tileId !== null && c.type !== 'sub' ? `T${c.tileId} · ${c.name}` : c.name; labelLayer.appendChild(el);
+    el.textContent = c.type === 'router' ? c.id.toUpperCase() : c.type === 'ni' ? 'NI ' + c.tileId : c.tileId !== null && c.type !== 'sub' ? `T${c.tileId} · ${c.name}` : c.name; if (tileNames.has(c.id)) el.textContent = tileNames.get(c.id)!;
+    el.dataset.sel = c.id;
+    labelLayer.appendChild(el);
     labels.push({ id: c.id, el, p: new THREE.Vector3(m.position.x, m.userData.labelY, m.position.z), minor: c.type === 'router' || c.type === 'ni' || c.type === 'clock', sub: c.type === 'sub', shown: false }); }
   for (const [txt, x, y, z] of [['100 MHz oscillator', -58, 0.6, -34], ['Button 1 re-attest · Button 2 revoke', -55, 1.2, 42], ['Switch: UART select', -40, 0.8, 34.4],
     ['LD0 auth · LD1 fail · LD2 T3 PASS · LD3 heartbeat', 47.5, -0.4, 41.6], ['RGB: T0 refused', 62, 0.2, 35], ['UART', 58, 0.6, -32]] as [string, number, number, number][]) {
@@ -294,6 +302,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
 
   // ------------------------------------------------------------------ camera
   const VIEWS: Record<string, [number[], number[]]> = {
+    angled: [[24, 65, 50], [0, 0, 0]],
     home: [[30, 34, 62], [0, 0, 2]],
     top: [[0, 96, 0.01], [0, 0, 0]],
     front: [[0, 32, 68], [0, 0, 4]],
@@ -310,8 +319,8 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     tile3: [[-32, 18, 36], [-17, 0, 11]]
   };
   const tw = { on: false, t: 0, p0: new THREE.Vector3(), p1: new THREE.Vector3(), g0: new THREE.Vector3(), g1: new THREE.Vector3() };
-  function setView(name: string, instant = false) { const v = VIEWS[name]; if (!v) return; tw.p1.fromArray(v[0]); tw.g1.fromArray(v[1]); if (phone) tw.p1.sub(tw.g1).multiplyScalar(1.5).add(tw.g1);
-    if (instant || reduce) { cam.position.copy(tw.p1); ctl.target.copy(tw.g1); ctl.update(); tw.on = false; dirty = camMoved = true; return; }
+  function setView(name: string, instant = false) { const v = VIEWS[name]; if (!v) return; tw.p1.fromArray(v[0]); tw.g1.fromArray(v[1]); if (phone) tw.p1.sub(tw.g1).multiplyScalar(name === 'top' || name === 'angled' ? 1.12 : 1.5).add(tw.g1);
+    if (instant || reduce) { cam.position.copy(tw.p1); ctl.target.copy(tw.g1); ctl.update(); tw.on = false; ctl.enabled = true; dirty = camMoved = true; return; }
     tw.p0.copy(cam.position); tw.g0.copy(ctl.target); tw.t = 0; tw.on = true; ctl.enabled = false; }
   const sph = new THREE.Spherical();
   function stepCamera(dir: string) { v1.copy(cam.position).sub(ctl.target); sph.setFromVector3(v1);
@@ -331,7 +340,14 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     tw.p1.set(ctr.x + r * 0.45, r * 1.05, ctr.z + r * 1.0); tw.g1.copy(ctr).setY(0); if (phone) tw.p1.sub(tw.g1).multiplyScalar(1.4).add(tw.g1);
     if (reduce) { cam.position.copy(tw.p1); ctl.target.copy(tw.g1); ctl.update(); dirty = camMoved = true; return; }
     tw.p0.copy(cam.position); tw.g0.copy(ctl.target); tw.t = 0; tw.on = true; ctl.enabled = false; }
-  function select(id: string | null) { selected = id; const root = id && byId.get(id)?.type === 'sub' ? byId.get(id)!.parentId : id;
+  const outline = new THREE.BoxHelper(dieM, 0xa9d5ff);
+  outline.visible = false;
+  scene.add(outline);
+  function select(id: string | null) { selected = id;
+    const block = id ? mesh.get(id) : null;
+    outline.visible = !!block;
+    if (block) outline.setFromObject(block);
+    const root = id && byId.get(id)?.type === 'sub' ? byId.get(id)!.parentId : id;
     subs.forEach((m) => { m.userData.lift = byId.get(m.userData.id)!.parentId === root ? 0.6 : 0; });
     labels.forEach((l) => l.el.classList.toggle('sel', l.id === id)); applyGlow(); camMoved = true; }
   const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
@@ -349,9 +365,56 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
 
   // ------------------------------------------------------------------ packets: a pure function of (event, progress), so seeking cannot leave stale state
   let animating = false;
+  let activeLabels: string[] = [];
+  const tag = document.createElement('span');
+  tag.className = 'packet-tag'; tag.hidden = true; tag.setAttribute('aria-hidden','true');
+  host.appendChild(tag);
+  const tagPoint = new THREE.Vector3();
+  let occupiedLabels: PlacedBox[] = [];
+  let tagWidth = 90;
+  function positionTag() {
+    if (tag.hidden) return;
+    tagPoint.copy(halo.position).project(cam);
+    const x = (tagPoint.x + 1) * fittedWidth / 2;
+    const y = (1 - tagPoint.y) * fittedHeight / 2;
+    const h = 22, w = tagWidth;
+    // Search outward from the packet using the bounds already computed for chip labels.
+    for (const dy of [-30, 10, -55, 34, -80, 58, -110, 88]) {
+      for (const dx of [0, -w * 0.65, w * 0.65]) {
+        const left = THREE.MathUtils.clamp(x + dx - w / 2, 4, fittedWidth - w - 4);
+        const top = THREE.MathUtils.clamp(y + dy, 4, fittedHeight - h - 4);
+        if (occupiedLabels.some(b => left < b.x2 + 2 && left + w > b.x1 - 2 && top < b.y2 + 2 && top + h > b.y1 - 2)) continue;
+        tag.style.transform = `translate(${left}px,${top}px)`;
+        return;
+      }
+    }
+    tag.style.transform = 'translate(6px,6px)';
+  }
   function showEvent(ev: Ev | null, t: number) { (Object.keys(flits) as VcId[]).forEach((k) => { flits[k].visible = false; }); ring3.visible = stop.visible = false; trail.visible = false; halo.intensity = 0; dirty = true;
-    if (!ev) return; const pa = paths.get(ev.id)!, f = flits[ev.vc], progress = THREE.MathUtils.clamp((t - 0.12) / 0.72, 0, 1), head = progress * pa.tot, a = trailGeo.attributes.position as THREE.BufferAttribute;
-    pa.pts.forEach((p, i) => a.setXYZ(i, p.x, PY - 0.3, p.z)); a.needsUpdate = true; trailGeo.setDrawRange(0, pa.pts.length); trail.computeLineDistances(); [trailMat.dashSize, trailMat.gapSize] = DASH[ev.vc]; trail.visible = true;
+    if (!ev) { tag.hidden = true; labels.forEach(l => l.el.classList.remove('carrying')); activeLabels = []; camMoved = true; return ''; }
+    const pa = paths.get(ev.id)!;
+    const progress = THREE.MathUtils.clamp(t, 0, 1);
+    const head = progress * pa.tot;
+    const nearest = pa.cum.reduce((best, distance, index) =>
+      Math.abs(distance - head) < Math.abs(pa.cum[best] - head) ? index : best, 0);
+    const roles = [ev.actor, ev.path[ev.path.length - 1], ev.path[nearest]];
+    if (roles.some((id, i) => activeLabels[i] !== id)) camMoved = true;
+    if (activeLabels[2] !== roles[2]) {
+      labels.forEach(l => l.el.classList.toggle('carrying', l.id === roles[2]));
+    }
+    activeLabels = roles;
+    const label = ev.id === 'acc-1' ? '0xC0DE5A5A' : ev.id === 'acc-2' ? 'ACK' : ev.id === 'ref-1' ? (t >= 1 ? 'Blocked' : '0xB0B0B0B0') : '';
+    tag.hidden = !label;
+    if (tag.textContent !== label) { tag.textContent = label; tagWidth = tag.offsetWidth; }
+    tag.dataset.kind = ev.vc;
+    const f = flits[ev.vc], a = trailGeo.attributes.position as THREE.BufferAttribute;
+    let reached = 0;
+    while (reached + 1 < pa.cum.length && pa.cum[reached + 1] <= head) reached++;
+    for (let i = 0; i <= reached; i++) a.setXYZ(i, pa.pts[i].x, PY - 0.3, pa.pts[i].z);
+    at(pa, head, v2);
+    a.setXYZ(reached + 1, v2.x, PY - 0.3, v2.z);
+    a.needsUpdate = true;
+    trailGeo.setDrawRange(0, reached + 2); trail.computeLineDistances(); [trailMat.dashSize, trailMat.gapSize] = DASH[ev.vc]; trail.visible = ev.vc !== 'local';
     for (let i = 0; i < NF; i++) { const dd = Math.max(0, head - i * 1.3); at(pa, dd, v1); at(pa, Math.min(pa.tot, dd + 0.4), v2); tmp.position.copy(v1); tmp.rotation.set(0, 0, 0); tmp.scale.setScalar(i === 0 ? 1.65 : 1 - i * 0.12); if (v2.distanceToSquared(v1) > 1e-6) tmp.lookAt(v2); tmp.updateMatrix(); f.setMatrixAt(i, tmp.matrix); }
     f.instanceMatrix.needsUpdate = true; f.visible = true; at(pa, head, halo.position); halo.position.y = PY + 0.4; halo.intensity = 100 + 65 * Math.cos(progress * Math.PI * 2);
     if (t < .12) {ring3.visible=true;ring3.position.copy(pa.pts[0]);ring3.scale.setScalar(1.4 - t * 4);}
@@ -371,6 +434,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
         halo.intensity = 50;
       }
     }
+    return ev.path[nearest];
   }
 
   // ------------------------------------------------------------------ board LEDs follow the design: LD0 = tile 3 authorized, LD1 = attestation failed, LD2 = CPU A pass flag,
@@ -406,11 +470,11 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     const candidates: Candidate[] = [];
 
     for (const l of labels) {
-      let show = labelsOn && cam.position.y > 0 && (
+      let show = labelsOn && cam.position.y > 0 && (activeLabels.includes(l.id) || (
         l.sub ? !phone && byId.get(l.id)?.parentId === parent :
         l.board ? !phone && bd.visible && deco.visible && dist > 56 :
         l.minor ? !phone && dist < 72 : true
-      );
+      ));
 
       if (show) {
         v1.copy(l.p).project(cam);
@@ -437,24 +501,9 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
 
       const sx = (v1.x * 0.5 + 0.5) * w;
       const sy = (-v1.y * 0.5 + 0.5) * h;
-      let priority = 10;
-      let bw = 64, bh = 22;
-      if (l.id === selected) {
-        priority = 100;
-        bw = 96;
-      } else if (focus.includes(l.id)) {
-        priority = 85;
-        bw = 90;
-      } else if (!l.minor && !l.sub && !l.board) {
-        priority = 50;
-        bw = 88;
-      } else if (l.board) {
-        priority = 30;
-        bw = 110;
-      } else if (l.sub) {
-        priority = 20;
-        bw = 64;
-      }
+      const priority = l.id === selected ? 110 : activeLabels.includes(l.id) ? 100
+        : tileNames.has(l.id) ? 95 : focus.includes(l.id) ? 85 : l.board ? 30 : l.minor ? 10 : 50;
+      const bw = l.el.offsetWidth, bh = l.el.offsetHeight;
 
       candidates.push({ l, sx, sy, priority, bw, bh });
     }
@@ -463,10 +512,11 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     candidates.sort((a, b) => b.priority - a.priority);
 
     const placed: PlacedBox[] = [];
+    occupiedLabels = placed;
 
     for (const c of candidates) {
-      let finalY = c.sy;
-      let visible = true;
+      const margin = 4;
+      c.sx = Math.max(c.bw / 2 + margin, Math.min(w - c.bw / 2 - margin, c.sx));
 
       const collides = (yPos: number) => {
         const x1 = c.sx - c.bw / 2 - 2;
@@ -476,15 +526,9 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
         return placed.some((b) => !(x2 < b.x1 || x1 > b.x2 || y2 < b.y1 || y1 > b.y2));
       };
 
-      if (collides(finalY)) {
-        if (!collides(finalY - 14)) {
-          finalY -= 14;
-        } else if (!collides(finalY + 14)) {
-          finalY += 14;
-        } else if (c.priority < 80) {
-          visible = false;
-        }
-      }
+      const candidatesY = [0, -1, 1, -2, 2].map(row => c.sy + row * (c.bh + margin));
+      const finalY = candidatesY.find(y => y >= c.bh && y <= h && !collides(y));
+      const visible = finalY !== undefined;
 
       if (visible) {
         placed.push({
@@ -503,14 +547,15 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     }
   }
   let last = performance.now(), hbT = 0;
-  function frame(now: number) { requestAnimationFrame(frame); if (entranceActive || document.hidden || host.closest('[hidden]') || !host.clientWidth || !host.clientHeight) { last = now; return; } const dt = Math.min(now - last, 80); last = now;
+  function frame(now: number) { requestAnimationFrame(frame); if (host.classList.contains('nogl') || entranceActive || document.hidden || host.closest('[hidden]') || !host.clientWidth || !host.clientHeight) { last = now; return; } const dt = Math.min(now - last, 80); last = now;
     if (tw.on) { tw.t = Math.min(1, tw.t + dt / 1000); const e = 1 - Math.pow(1 - tw.t, 4); cam.position.lerpVectors(tw.p0, tw.p1, e); ctl.target.lerpVectors(tw.g0, tw.g1, e); dirty = camMoved = true; if (tw.t >= 1) { tw.on = false; ctl.enabled = true; } }
     if (!reduce) { hbT += dt; if (hbT >= 335) { hbT = 0; ledOn[3] = !ledOn[3]; paintLeds(); } }
     animating = false; glow.forEach((o) => { if (Math.abs(o.t - o.g) > 0.004) { o.g += (o.t - o.g) * Math.min(1, dt * 0.008); o.ms.forEach((m) => { m.emissiveIntensity = o.g * 0.5; }); animating = true; } });
     for (const m of subs) { const ty = m.userData.y0 + m.userData.lift; if (Math.abs(m.position.y - ty) > 0.002) { m.position.y += (ty - m.position.y) * Math.min(1, dt * 0.012); animating = true; } }
+    if (outline.visible && animating) outline.update();
     ctl.update(); bd.visible = cam.position.y > -1;                         // from below, the board is hidden so the ball grid can be seen
     if (camMoved) { camMoved = false; layoutLabels(); }
-    if (dirty || animating) { dirty = false; renderer.render(scene, cam); } }
+    if (dirty || animating) { positionTag(); dirty = false; renderer.render(scene, cam); } }
   requestAnimationFrame(frame);
   void btnCaps;
 

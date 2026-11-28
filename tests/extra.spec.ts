@@ -31,6 +31,7 @@ test('camera-pose matrix: six directions, four corners, close-ups, underside', a
 
 test('scrub bar and keyboard orbit', async ({ page }) => {
   await page.goto('/#explore/access'); await page.waitForFunction(ready);
+  await page.getByText('Playback details', { exact: true }).click();
   await page.locator('#scrub').focus(); await page.locator('#scrub').fill('1000');
   expect(await run<{ uart: string }>(page, 'return p.derived()')).toMatchObject({ uart: 'T3 PASS', led: '0001' });
   await page.locator('#scrub').fill('0');
@@ -61,32 +62,38 @@ test('How it works animation: steps, memory, UART, gate and refusal follow the d
 
 test('tile card: every tile shows name, purpose, resources, what it does and its demo role', async ({ page }) => {
   await page.goto('/#explore'); await page.waitForFunction(ready);
-  const expect3: Record<number, [string, string]> = { 0: ['Tile 0 \u2014 RISC-V CPU B', '2,566'], 1: ['Tile 1 \u2014 Network tile', '32'], 2: ['Tile 2 \u2014 Shared memory', '4'], 3: ['Tile 3 \u2014 RISC-V CPU A', '8,117'], 4: ['Tile 4 \u2014 Root of trust', '5,802'], 5: ['Tile 5 \u2014 Untrusted port', '5'] };
+  const expect3 = arch.tiles.map((tile: { primary: string }) => arch.components.find((c: { id: string }) => c.id === tile.primary));
+  await page.locator('#btn-mode-learn').click();
+  await page.locator('#inspector > summary').click();
   for (let t = 0; t < 6; t++) {
     await page.locator(`.tilebar [data-tile="${t}"]`).click();
     const card = page.locator('#insp');
-    await expect(card.locator('h2')).toHaveText(expect3[t][0]);
-    await expect(card.locator('.stats').first()).toContainText(expect3[t][1]);
+    await expect(card.locator('h2')).toHaveText(expect3[t].name);
+    await expect(card.locator('.stats').first()).toContainText((expect3[t].metrics.lut ?? expect3[t].metrics.bram).toLocaleString('en-US'));
     await expect(card.locator('.stats').first()).toContainText('LUTs');
-    await expect(card).toContainText('What it does'); await expect(card).toContainText('In this demo');
+    await expect(card.getByText(`Tile ${t} context and resource accounting`, {exact: true})).toBeVisible();
     await expect(page.locator(`.tilebar [data-tile="${t}"]`)).toHaveAttribute('aria-pressed', 'true');
   }
   await page.locator('.tilebar [data-tile="2"]').click(); await page.locator('#insp ul.parts button', { hasText: 'Memory front end' }).click();
-  await expect(page.locator('#insp .selbox')).toContainText('Not separately measured');
+  await expect(page.locator('#insp .stats')).toContainText('Not separately measured');
   await expect(page.locator('#insp')).not.toContainText('NaN');
 });
 
-test('Watch the demo runs the scenarios in order with a who / what / why caption', async ({ page }) => {
-  await page.goto('/#explore'); await page.waitForFunction(ready);
+test('short demo and full walkthrough use separate playlists', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#explore');
   await page.locator('#bdemo').click();
-  expect(await run<boolean>(page, 'return p.st.tour')).toBe(true);
-  await expect(page.locator('#cap .capwho')).toHaveText('Tile 3 \u00b7 CPU A');
-  await expect(page.locator('#cap')).toContainText('Why it matters');
-  await expect(page.locator('#bdemo')).toHaveText('Stop the demo');
-  await run(page, 'p.st.t = 1.6;');                                                   // finish the first step; software GL renders slowly, so wait on state, not time
-  await page.waitForFunction(() => (window as unknown as { __pq: { st: { sc: number } } }).__pq.st.sc === 1, null, { timeout: 30_000 });   // moved on to "Attest tile 3"
-  await expect(page.locator('#insp h2')).toHaveText('Tile 4 \u2014 Root of trust');   // card follows whoever acts
-  await page.locator('#bdemo').click(); expect(await run<boolean>(page, 'return p.st.tour')).toBe(false);
+  await expect(page.locator('#stepcount')).toHaveText('1 of 4 · Setup');
+  await page.locator('#bnext').click();
+  await expect(page.locator('#stepcount')).toHaveText('2 of 4 · Write');
+  await page.locator('#bnext').click();
+  await expect(page.locator('#stepcount')).toHaveText('3 of 4 · ACK');
+  await page.locator('#bnext').click();
+  await expect(page.locator('#stepcount')).toHaveText('4 of 4 · Refusal');
+  await page.locator('#bfull').click();
+  await expect(page.locator('#cap')).toContainText('Boot and measure');
+  await page.locator('#bnext').click();
+  await expect(page.locator('#cap')).toContainText('Attest tile 3');
 });
 
 for (const hash of ['#explore', '#how', '#architecture', '#results', '#scope']) {

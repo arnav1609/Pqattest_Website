@@ -20,7 +20,7 @@ const run = <T>(page: Page, body: string) => page.evaluate(`(() => { const p = w
 
 test('loads with no console errors and no external requests', async ({ page }) => {
   const { errors, external } = await open(page);
-  await expect(page.locator('.heroscope')).toContainText('Hardware attestation with SHA3-256 and KMAC128');
+  await expect(page.locator('.heroscope')).toContainText('six-tile RISC-V network');
   await expect(page.locator('.mode')).toContainText('Explanatory walkthrough');
   await page.waitForTimeout(800);
   expect(errors, errors.join('\n')).toEqual([]);
@@ -40,22 +40,24 @@ test('every section route renders and deep links survive a reload', async ({ pag
 
 test('block list is keyboard operable and drives the inspector', async ({ page }) => {
   await open(page);
+  await page.locator('#btn-mode-learn').click();
+  await page.locator('#inspector > summary').click();
   await page.locator('#q').fill('verifier');
   await page.keyboard.press('Tab'); await page.keyboard.press('Enter');
   await expect(page.locator('#insp .selname')).toHaveText('RoT verifier');
   await expect(page.locator('#insp')).toContainText('5,802');
   await expect(page.locator('#insp .badges')).toContainText('Current build');
   expect(await run<string>(page, 'return p.st.sel')).toBe('ver');
-  await expect(page).toHaveURL(/#explore\/boot\/ver$/);
+  await expect(page).toHaveURL(/#explore\/access\/ver\?step=setup&tour=short$/);
 });
 
 test('scenario state is derived from events, so seeking backwards is consistent', async ({ page }) => {
   await open(page);
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.locator('#btn-mode-learn').click();
   await page.locator('#scn button', { hasText: 'Attest tile 3' }).click();
   await page.locator('#bplay').click();               // pause wherever it is
   await run(page, 'p.seek(2, false); p.st.t = 1;');
-  await page.locator('#events button').nth(2).click(); await run(page, 'p.st.playing = false; p.st.t = 1;');
+  await page.locator('#stepchoices button').nth(2).click(); await run(page, 'p.st.playing = false; p.st.t = 1;');
   expect((await run<{ auth: boolean }>(page, 'return p.derived()')).auth).toBe(true);     // after GRANT
   await run(page, 'p.seek(0, false)');
   expect((await run<{ auth: boolean }>(page, 'return p.derived()')).auth).toBe(false);    // rewound before GRANT
@@ -69,6 +71,7 @@ test('scenario state is derived from events, so seeking backwards is consistent'
 });
 
 test('3D: clicking a block at fixed camera poses selects that block', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await open(page);
   const ok = await run<boolean>(page, 'return !!(p.api && p.api.ok)');
   test.skip(!ok, 'WebGL not available in this browser');
@@ -85,12 +88,16 @@ test('3D: clicking a block at fixed camera poses selects that block', async ({ p
   const box = (await page.locator('#stage canvas').boundingBox())!;
   await page.mouse.click(box.x + s.x, box.y + s.y);
   await expect(page.locator('#insp .selname')).toHaveText('RoT verifier');
+  expect(await run(page, `return p.api.screenOf('ver')`)).toEqual(s);
+  await page.locator('.tilebar [data-tile="3"]').click();
+  expect(await run(page, `return p.api.screenOf('ver')`)).toEqual(s);
   const info = await run<{ calls: number; triangles: number }>(page, 'return p.api.info()');
   expect(info.calls).toBeLessThanOrEqual(250); expect(info.triangles).toBeLessThanOrEqual(250000);
 });
 
 test('camera step buttons and view toggles work without dragging', async ({ page }) => {
   await open(page);
+  await page.locator('.view-options summary').click();
   for (const name of ['Rotate left', 'Tilt down', 'Zoom in']) await page.getByRole('button', { name }).click();
   await page.locator('#view').selectOption('underside');
   await page.locator('#blogical').click(); await expect(page.locator('#repr')).toContainText('Logical view');

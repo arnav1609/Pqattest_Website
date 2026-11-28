@@ -1,5 +1,4 @@
-// Single-file version of dist/ for hosts that take one HTML page (the claude.ai artifact link): CSS, fonts (woff2 as data URIs)
-// and the JS bundle are inlined; no <html>/<head>/<body> wrapper, as that host adds its own. Output: dist-single/pq-attest-explorer.html
+// Inline the production assets into the hosted HTML shell for offline use.
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 const dist = new URL('../dist/', import.meta.url), assets = new URL('assets/', dist);
 const files = readdirSync(assets);
@@ -14,12 +13,10 @@ css = css.replace(/,\s*url\([^)]*\.woff\)\s*format\(["']woff["']\)/g, '')       
 if (/url\((?!data:)/.test(css)) throw new Error('a CSS url() was not inlined');
 if (js.includes('import(') && /import\(["']\.\//.test(js)) throw new Error('the bundle has a dynamic chunk; build with PUBLIC_SAFE on');
 const html = readFileSync(new URL('index.html', dist), 'utf8');
-const body = html.slice(html.indexOf('<body'), html.indexOf('</body>')).replace(/<script[\s\S]*?<\/script>/g, '').trim();
-const page = `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"><title>PQ-Attest SoC Explorer</title>
-<style>${css}</style>
-${body}
-<script type="module">${js.replace(/<\/script/g, '<\\/script')}</script>
-`;
+const page = html
+  .replace(/<script\b[^>]*src=[^>]*><\/script>/g, '')
+  .replace(/<link\b[^>]*rel="stylesheet"[^>]*>/g, () => '<style>' + css + '</style>')
+  .replace('</body>', () => '<script type="module">' + js.replace(/<\/script/gi, '<\\/script') + '</script></body>');
 mkdirSync(new URL('../dist-single/', import.meta.url), { recursive: true });
 writeFileSync(new URL('../dist-single/pq-attest-explorer.html', import.meta.url), page);
 console.log('single file:', (page.length / 1024).toFixed(0), 'kB');

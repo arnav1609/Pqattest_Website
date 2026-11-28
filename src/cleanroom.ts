@@ -2,15 +2,43 @@ import room from './assets/cleanroom-photo.webp';
 import die from './assets/die-top.webp';
 import './cleanroom.css';
 
+const researchQuestions = [
+  ['When does a revoked permission actually stop a write?',
+   'Tile 4 can cancel Tile 3’s grant while a write is already travelling to Tile 2. The question is which clock edge at shared memory decides whether that write may commit. The walkthrough shows the simpler case of a new request after revocation.'],
+  ['Does sharing the authentication engine delay revocation?',
+   'KMAC checks messages on the authenticated link. The first task is to trace whether REVOKE actually uses that engine. If it does, the study compares dedicated and shared engines under the same traffic and measures the time from Tile 4’s decision to effective denial at memory.'],
+  ['What does each design cost in silicon?',
+   'A shared engine could save area but introduce waiting or a longer timing path. The planned ASIC comparison measures area, timing and routing under matched conditions. The current FPGA results provide a baseline for the prototype.'],
+];
+
 const chapters = [
-  ['The problem', 'Who gets to use shared memory?', 'Several processors share the same on-chip network. A message can reach a memory interface, but its arrival alone tells us little about the processor that sent it. Should that processor be allowed to write?', 'PQ-Attest explores how hardware can check a processor’s firmware before granting access. A root of trust asks for evidence, checks the response, then decides whether to open the processor’s gate.', 'See how it works', '#how'],
-  ['The build', 'Six tiles, one trust decision', 'The prototype connects six tiles on an FPGA. A RISC-V processor on tile 3 answers a challenge from the root of trust. After a successful check, its network interface can forward a request to shared memory.', 'Select a block in the chip explorer to inspect its role and statistics. Follow a request through the routers, then follow the reply back to the processor.', 'Explore the architecture', '#architecture'],
-  ['The tests', 'What happened at the gate?', 'The walkthroughs show a trusted processor accessing memory, an untrusted processor being stopped locally, and permission being revoked. A local refusal ends at the sending tile.', 'The results page ties measurements to the build that produced them. The forged-packet test belongs to simulation; the corresponding external port is tied off in the board image.', 'See measured results', '#results']
+  {
+    label: 'The problem', title: 'What problem are we solving?',
+    paragraphs: [
+      'How quickly can a chip withdraw permission to change shared memory? PQ-Attest starts with a six-tile network. Tile 4 checks Tile 3’s firmware and grants access to memory on Tile 2. The harder case comes when Tile 4 cancels permission while work is already in flight.',
+    ], action: 'See how it works', href: '#how',
+  },
+  {
+    label: 'The build', title: 'How does the six-tile chip enforce that decision?',
+    paragraphs: [
+      'The prototype is a 3 × 2 network of tiles implemented on an Artix-7 FPGA. Tile 3 hashes its entire 16 KiB instruction memory with SHA3-256. That fingerprint gives Tile 4 a way to check which firmware image was measured.',
+      'Tile 4 sends a fresh challenge. Tile 3 returns its measurement and a KMAC128 tag made with a shared key. Tile 4 checks the response against the expected measurement and issues GRANT if it matches. The fresh challenge prevents an old reply from being reused.',
+      'Once authorized, Tile 3 can send a write through routers 3 → 4 → 5 → 2. Tile 2 stores the number and sends a receipt, labeled ACK, back to Tile 3. This is the exchange you can follow in the explorer.',
+    ], action: 'Explore the architecture', href: '#architecture',
+  },
+  {
+    label: 'The tests', title: 'What happened at the gate?',
+    paragraphs: [
+      'In the authorized case, Tile 3 writes 0xC0DE5A5A and receives an ACK. It then reads the address back. Only when the returned value matches does the firmware print T3 PASS. The short demo shows the write and receipt. The full walkthrough includes the readback.',
+      'Tile 0 tries the same address with 0xB0B0B0B0. Its bridge refuses the request locally, so no write packet enters the mesh. A separate revocation test shows that Tile 3 also loses access when its grant is withdrawn.',
+      'These behaviors were checked in simulation. The 15 November Revision 10 FPGA build met its 50 MHz timing target after routing. A board pass was reported for the earlier 7 November image. Board testing of Revision 10 is still pending.',
+    ], action: 'See measured results', href: '#results',
+  },
 ];
 export function mountRoom(enterExplorer: () => DOMRect | undefined, finishEntrance: () => void) {
  const section=document.createElement('section');section.id='cleanroom';section.setAttribute('aria-label','PQ-Attest cleanroom introduction');
  document.querySelector('main')!.prepend(section);
- section.innerHTML=`<div class="room-frame"><div class="room-light"><img class="room-base" alt="A suited engineer beside a lithography tool and a chip on an inspection bench"></div><img class="tray-die" alt=""><span class="room-marker" aria-hidden="true"></span><button class="room-person">Meet the engineer</button><a class="room-chip" href="#inspect">Explore the chip ↗</a></div>`;
+ section.innerHTML=`<div class="room-frame"><div class="room-light"><img class="room-base" alt="A suited engineer beside a lithography tool and a chip on an inspection bench"></div><img class="tray-die" alt=""><span class="room-marker" aria-hidden="true"></span><p class="room-note">Illustrative cleanroom · Artix-7 FPGA prototype</p><button class="room-person">Meet the engineer</button><a class="room-chip" href="#inspect">Explore the chip ↗</a></div>`;
  const frame=section.querySelector<HTMLElement>('.room-frame')!;
  section.querySelector<HTMLImageElement>('.room-base')!.src=room;
  const photo=frame.querySelector<HTMLElement>('.room-light')!;
@@ -113,15 +141,15 @@ export function mountRoom(enterExplorer: () => DOMRect | undefined, finishEntran
    }
  };
  const dlg=document.createElement('dialog');dlg.className='room-guide';dlg.setAttribute('aria-labelledby','guide-title');document.body.append(dlg);
- function chapter(i:number){const [label,title,first,second,action,href]=chapters[i];
- dlg.innerHTML=`<button class="room-close" aria-label="Close guide">×</button><p class="eyebrow">ENGINEER’S GUIDE</p><nav aria-label="Guide chapters">${chapters.map(([name],j)=>`<button data-chapter="${j}" aria-pressed="${j===i}">${name}</button>`).join('')}</nav><p class="eyebrow">${label}</p><h2 id="guide-title" tabindex="-1">${title}</h2><p>${first}</p><p>${second}</p>${section.isConnected ? '' : `<a href="${href}">${action} →</a>`}`;
+ function chapter(i:number){const {title,paragraphs,action,href}=chapters[i];
+ const research = i === 0 ? `<ol class="research-questions">${researchQuestions.map(([question, explanation]) => `<li><h3>${question}</h3><p>${explanation}</p></li>`).join('')}</ol>` : '';
+ dlg.innerHTML=`<button class="room-close" aria-label="Close guide">×</button><p class="eyebrow">ENGINEER’S GUIDE</p><nav aria-label="Guide chapters">${chapters.map(({label:name},j)=>`<button data-chapter="${j}" aria-pressed="${j===i}">${name}</button>`).join('')}</nav><h2 id="guide-title" tabindex="-1">${title}</h2>${paragraphs.map(text => `<p>${text}</p>`).join('')}${research}${section.isConnected ? '' : `<a href="${href}">${action} →</a>`}`;
  dlg.querySelector('h2')!.focus();}
  dlg.onclick=(e)=>{const el=e.target as HTMLElement;if(el.dataset.chapter!==undefined)chapter(Number(el.dataset.chapter));else if(el.closest('a,.room-close')||el===dlg)dlg.close();};
  function open(){
-   frame.classList.add('welcoming');
+   if (entering || dlg.open) return;
    chapter(0);
    dlg.showModal();
-
  }
  function navigate(){
    dlg.innerHTML = `<button class="room-close" aria-label="Close guide">×</button>
@@ -132,7 +160,6 @@ export function mountRoom(enterExplorer: () => DOMRect | undefined, finishEntran
      <li><a href="#results">See measured results</a></li><li><a href="#glossary">Look up a term</a></li></ul>`;
    dlg.showModal();
  }
- dlg.onclose=()=>frame.classList.remove('welcoming');
  section.querySelector('.room-person')!.addEventListener('click',open);
  frame.addEventListener('click',e=>{
    if(entering || (e.target as Element).closest('a,button'))return;

@@ -9,7 +9,8 @@ for (const width of [390,1440]) {
     const bounds=await page.locator('#cleanroom').boundingBox();
     expect(bounds).toEqual({x:0,y:0,width,height:900});
     await page.getByRole('button',{name:'Meet the engineer'}).click();
-    await expect(page.getByRole('dialog')).toContainText('Who gets to use shared memory?');
+    await expect(page.getByRole('dialog')).toContainText('What problem are we solving?');
+    await expect(page.locator('.research-questions li')).toHaveCount(3);
     await page.getByRole('button',{name:'The tests',exact:true}).click();
     await page.getByRole('button',{name:'Close guide'}).click();
     const originalCanvas=await page.locator('#stage canvas').elementHandle();

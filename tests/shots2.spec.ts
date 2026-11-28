@@ -10,9 +10,10 @@ test('presentation screenshots', async ({ page }) => {
   await page.goto('/#explore'); await page.waitForFunction(ready); await page.waitForTimeout(800);
   await page.screenshot({ path: `${out}landing.png` });
   await page.locator('#bdemo').click();
-  await page.evaluate(`const p = window.__pq; p.st.playing = false; p.st.tour = true; p.st.sc = 2; p.seek(0, false);`); await page.waitForTimeout(1500);
+  await page.locator('#stepchoices button', {hasText: 'Write'}).click();
   await page.screenshot({ path: `${out}landing-demo.png` });
-  await page.evaluate(`window.__pq.st.tour = false`);
+  await page.locator('#btn-mode-learn').click();
+  await page.locator('#inspector > summary').click();
   await page.locator('.tilebar [data-tile="3"]').click(); await page.waitForTimeout(1600);
   await page.screenshot({ path: `${out}tile3-card.png`, fullPage: true });
   await page.goto('/#results'); await page.waitForTimeout(400); await page.screenshot({ path: `${out}results.png` });

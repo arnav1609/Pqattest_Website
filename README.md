@@ -1,6 +1,6 @@
 # PQ-Attest SoC Explorer
 
-A static website that explains the PQ-Attest prototype: an interactive 3D view of the design, a replay of the attestation and
+A static website that explains the PQ-Attest prototype: linked 3D and keyboard-accessible 2D views of the design, a replay of the attestation and
 memory-access flows, a block inspector, and the measured results with the build each number belongs to.
 
 It is a visualisation and evidence browser. It is not a simulator, and the 3D chip is a conceptual drawing, not a floorplan.
@@ -10,7 +10,7 @@ It is a visualisation and evidence browser. It is not a simulator, and the 3D ch
 Needs Node 20 or newer.
 
 ```bash
-npm install
+npm ci
 ```
 
 ```bash
@@ -34,13 +34,19 @@ Then open http://127.0.0.1:4173. The `dist/` folder is self-contained (no CDN, f
 npm run build:single
 ```
 
-That writes `dist-single/pq-attest-explorer.html` (about 0.7 MB, everything inlined) and checks that it starts from `file://`.
+That writes `dist-single/pq-attest-explorer.html` with its artwork, scripts and fonts inlined and checks that it starts from `file://`.
 
 Tests (builds must exist first; the first run needs `npx playwright install chromium`):
 
 ```bash
 npm test
 ```
+
+## Evidence and presentation
+
+Revision 10 (15 November 2026) is an FPGA implementation after place and route. Its current-image board validation is pending. The 7 November board report concerns an earlier image. Matched simulation measured 32 cycles for a protected read or write, versus 28 and 27 cycles in the comparison configuration. The forged-packet example is a simulation test. The explorer animates these events at explanatory speed.
+
+Choose the chip to enter, then Watch the demo. Choose Full walkthrough for the readback and revocation events. Selecting a block opens its specifications and brings its resource figures into view. Use 2D network to inspect tiles and follow the ordered route without a GPU.
 
 ## Layout
 

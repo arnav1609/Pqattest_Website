@@ -392,7 +392,7 @@
           "actor": "spoof",
           "who": "Tile 5 · Untrusted port",
           "plain": "A forged packet is injected and rejected by the quarantine. This runs in simulation only.",
-          "matters": "Fake security messages cannot get into the network."
+          "matters": "In this simulation, the injected control packet is contained at the untrusted ingress."
         }
       ]
     }

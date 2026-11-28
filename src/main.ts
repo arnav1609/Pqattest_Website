@@ -1,3 +1,5 @@
+import { mountMesh } from './meshView';
+import { story, storyLength, storyFrame, storyNarration, readingSteps, fieldNotes } from './story';
 import { mountRoom } from './cleanroom';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/latin-500.css';
@@ -22,81 +24,97 @@ main.innerHTML = `
 <section id="explore" class="explore" aria-label="Explore chip">
   <header class="hero">
     <div class="herotext">
-      <h1>A network-on-chip that checks a processor before trusting it</h1>
-      <p class="lead">Six tiles on an FPGA. A root of trust challenges a RISC-V processor, checks a fingerprint of its firmware, and only then lets it use the shared memory. A processor that was never trusted is stopped inside its own tile.</p>
-      <p class="heroscope">FPGA prototype on Artix-7 at 50 MHz. Hardware attestation with SHA3-256 and KMAC128 authentication on a 6-tile RISC-V network-on-chip. <a href="#scope">System capabilities &amp; scope &rarr;</a></p>
+      <h1>Chip explorer</h1>
+      <p class="heroscope">Follow a memory request across the six-tile RISC-V network.</p>
     </div>
     <div class="heroact">
       <div class="mode-toggle-wrap">
-        <span class="mode-label">Mode:</span>
-        <div class="mode-toggle" role="radiogroup" aria-label="Explanation Mode">
-          <button type="button" role="radio" class="mode-btn" id="btn-mode-pres" aria-checked="false"><span class="mode-icon">&#127919;</span> Presentation</button>
-          <button type="button" role="radio" class="mode-btn active" id="btn-mode-learn" aria-checked="true"><span class="mode-icon">&#127891;</span> Learning Mode</button>
+        <div class="mode-toggle" role="group" aria-label="Explorer mode">
+          <button type="button" class="mode-btn" id="btn-mode-pres" aria-pressed="false">Presentation</button>
+          <button type="button" class="mode-btn active" id="btn-mode-learn" aria-pressed="true">Learning</button>
         </div>
       </div>
       <button type="button" id="bdemo" class="primary big">Watch the demo</button>
-      <a class="ghostlink" href="#overview">System overview &rarr;</a>
-      <a class="ghostlink" href="#glossary">Glossary &rarr;</a>
-      <a class="ghostlink" href="#how">Step-by-step diagram</a>
+      <button type="button" id="bfull">Full walkthrough</button>
     </div>
   </header>
-  <div class="tilebar" role="group" aria-label="Choose a tile">
-    <span class="tbl">Tiles</span>
-    ${tiles.map((t) => `<button type="button" data-tile="${t.id}" aria-pressed="false"><b>${t.id}</b>${esc(t.name)}</button>`).join('')}
-  </div>
   <div class="grid">
-    <div class="stagewrap">
-      <div class="stage" id="stage" tabindex="0" role="application" aria-label="3D view of the chip. Arrow keys rotate, plus and minus zoom, Home resets. Every block is also listed beside it.">
-        <div class="labels" id="labels" aria-hidden="true"></div>
-        <div class="tip" id="tip" hidden></div>
-        <div class="cap" id="cap" aria-live="polite"></div>
+    <div class="stagewrap"><button class="mesh-switch" type="button" id="mesh-switch" aria-pressed="false">2D network</button>
         <div class="cambar" role="group" aria-label="Camera">
+          <button type="button" data-preset="top">Top</button>
+          <button type="button" data-preset="angled">Angled</button>
+          <button type="button" data-preset="top" aria-label="Reset camera">Reset</button>
+          <details class="view-options"><summary>View options</summary><div class="view-options-body">
           <select id="view" aria-label="Camera view">
-            <option value="home">Home view</option><option value="top">Top</option><option value="front">Front</option><option value="back">Back</option>
+            <option value="angled">Angled</option><option value="home">Home view</option><option value="top">Top</option><option value="front">Front</option><option value="back">Back</option>
             <option value="left">Left</option><option value="right">Right</option><option value="underside">Underside</option><option value="noc">Network</option><option value="tile3">Tile 3 close-up</option>
           </select>
           <button type="button" data-cam="left" aria-label="Rotate left">&larr;</button><button type="button" data-cam="right" aria-label="Rotate right">&rarr;</button>
           <button type="button" data-cam="up" aria-label="Tilt up">&uarr;</button><button type="button" data-cam="down" aria-label="Tilt down">&darr;</button>
           <button type="button" data-cam="in" aria-label="Zoom in">+</button><button type="button" data-cam="out" aria-label="Zoom out">&minus;</button>
           <button type="button" id="blogical" aria-pressed="false">Logical</button><button type="button" id="blabels" aria-pressed="true">Labels</button>
+          </div></details>
         </div>
+      <div class="stage" id="stage" tabindex="0" role="region" aria-label="3D view of the chip. Arrow keys rotate, plus and minus zoom, Home resets. Choose Inspect components below to browse all blocks.">
+        <div class="labels" id="labels" aria-hidden="true"></div>
+        <div class="tip" id="tip" hidden></div>
         <div class="fallback" id="fallback" hidden></div>
       </div>
+        <div class="cap" id="cap">
+          <div aria-live="polite" aria-atomic="true"><span class="capmeta"></span><p class="capwhat"></p><p class="capexplain"></p></div>
+          <p id="packet-place" hidden></p>
+        </div>
       <p class="repr" id="repr">Conceptual drawing: block sizes follow measured LUT counts; positions are illustrative, not a place-and-route floorplan.</p>
     </div>
-    <aside class="side">
-      <section class="insp" id="insp" aria-live="polite" aria-label="Selected tile"></section>
-      <section class="clist" aria-label="All blocks">
-        <label for="q">Find any block</label>
-        <input id="q" type="search" placeholder="router, memory, verifier..." autocomplete="off">
-        <ul id="list"></ul>
-      </section>
-    </aside>
     <section class="timeline" aria-label="Replay">
-      <div class="trow trow-scn">
-        <div class="scn" id="scn" role="group" aria-label="Scenario"></div>
-      </div>
       <div class="trow trow-ctrl">
         <div class="btn-group">
           <button type="button" id="bprev" aria-label="Previous step">Previous</button>
           <button type="button" id="bplay" class="primary">Play</button>
           <button type="button" id="bnext" aria-label="Next step">Next</button>
-          <button type="button" id="brestart">Restart</button>
+          <button type="button" id="brestart">Replay</button>
         </div>
         <div class="speed-group">
-          <label for="speed">Speed</label>
-          <select id="speed"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="2">2x</option></select>
+          <label for="speed">Playback speed</label>
+          <select id="speed"><option value="0.5">0.5×</option><option value="0.75" selected>0.75×</option><option value="1">1×</option><option value="2">2×</option></select>
         </div>
-        <div class="readouts">
+        <div class="readouts learning-only">
           <span class="read"><b>Tile 3</b><span id="rauth"></span></span>
-          <span class="read"><b>UART</b><span id="ruart"></span></span>
-          <span class="read"><b>LED</b><span id="rled"></span></span>
+          <span class="read"><b>UART output</b><span id="ruart"></span></span>
+          <span class="read"><b>Board indicators</b><span id="rled"></span></span>
         </div>
       </div>
-      <div class="trow"><label for="scrub">Position</label><input id="scrub" type="range" min="0" max="1000" value="0" step="1"></div>
+      <div class="stepbar"><span id="stepcount"></span><div id="stepchoices" role="group" aria-label="Playback steps"></div></div>
+      <section class="step-context" aria-labelledby="context-heading"><h3 id="context-heading"></h3><p id="context-body"></p></section>
+    </section>
+    <section class="reading-panel" id="demo-guide" aria-labelledby="demo-guide-title">
+      <h2 id="demo-guide-title">How the demo works</h2>
+      <ol class="reading-steps">${readingSteps.map(x => `<li><h3>${esc(x.name)}</h3><p>${esc(x.text)}</p></li>`).join('')}</ol>
+    </section>
+    <section class="reading-panel learning-only" id="event-guide" aria-labelledby="event-title">
+      <h2 id="event-title">Inside this step</h2>
+      <div id="learn-timeline-card"></div>
+      <details class="techd" id="audit-guide"><summary>How the security check works</summary><dl id="audit-facts"></dl></details>
+    </section>
+    <details class="side learning-only" id="inspector"><summary>Inspect components</summary>
+      <div class="tilebar" role="group" aria-label="Tiles">
+        ${tiles.map(t => `<button type="button" data-tile="${t.id}" aria-pressed="false"><b>${t.id}</b>${esc(t.name)}</button>`).join('')}
+      </div>
+      <section class="insp" id="insp" tabindex="-1" aria-live="polite" aria-label="Selected component"></section>
+      <section class="clist" aria-label="All blocks">
+        <label for="q">Find any block</label>
+        <input id="q" type="search" placeholder="router, memory, verifier..." autocomplete="off">
+        <ul id="list"></ul>
+      </section>
+    </details>
+    <section class="timeline learning-only" aria-label="Scenario details">
+      <div class="trow trow-scn">
+        <div class="scn" id="scn" role="group" aria-label="Scenario"></div>
+      </div>
+      <details class="techd"><summary>Playback details</summary>
+<div class="trow"><label for="scrub">Fine position</label><input id="scrub" type="range" min="0" max="1000" value="0" step="1"></div></details>
       <p class="where" id="where"></p>
-      <ol class="events" id="events"></ol>
-      <div id="learn-timeline-card" class="learn-timeline-wrap"></div>
+
       <details class="techd"><summary>Technical detail for this step</summary><div class="narr" id="narr"></div>
         <p class="mode">${esc(playbackMode)}</p></details>
     </section>
@@ -114,11 +132,28 @@ main.innerHTML = `
 // ---------------------------------------------------------------- 3D scene (optional: everything also works without it)
 let api: SceneApi | null = null;
 try { const a = createScene($('#stage'), $('#labels'), reduce); if (a.ok) api = a; } catch (e) { console.warn('3D view unavailable', e); }
-let fallbackHow: { go(i: number, play: boolean): void } | null = null;
-if (!api) {           // no WebGL: the stage shows the step-by-step diagram instead of an empty box
-  $('#stage').classList.add('nogl'); const fb = $('#fallback'); fb.hidden = false;
-  fb.innerHTML = '<p class="muted">The 3D view needs WebGL, which this browser does not provide. Here is the same story as a diagram; every block is still listed beside it.</p><div id="fbhow"></div>';
-  mountHowAnimation($('#fbhow'), reduce, 'fb-'); fallbackHow = ($('#fbhow') as unknown as { __how: { go(i: number, play: boolean): void } }).__how; }
+
+const stage = $('#stage'), fallback = $('#fallback'), meshSwitch = $('#mesh-switch');
+const stageLabel = stage.getAttribute('aria-label')!;
+const mesh = mountMesh(fallback, id => select(id));
+let useMesh = !api;
+function setMeshMode(on: boolean) {
+  useMesh = on || !api;
+  stage.classList.toggle('nogl', useMesh);
+  fallback.hidden = !useMesh;
+  stage.setAttribute('aria-label', useMesh ? 'Interactive 2D network. Choose a tile or component to inspect.' : stageLabel);
+  meshSwitch.hidden = !api;
+  meshSwitch.setAttribute('aria-pressed', String(useMesh));
+  meshSwitch.textContent = useMesh ? 'Return to 3D chip' : '2D network';
+}
+meshSwitch.addEventListener('click', () => {setMeshMode(!useMesh); updateFrame();});
+stage.addEventListener('webglcontextlost', () => {
+  api = null; setMeshMode(true); updateFrame();
+}, true);
+setMeshMode(useMesh);
+function showFrame(e: Ev, progress: number) {
+  return useMesh || !api ? mesh.render(e, progress) : api.showEvent(e, progress);
+}
 
 // ---------------------------------------------------------------- state & mode
 const st = {
@@ -127,9 +162,11 @@ const st = {
   ev: 0,
   t: reduce ? 1 : 0,
   playing: false,
-  speed: 1,
-  tour: false,
-  mode: 'learning' as Mode
+  speed: Number($<HTMLSelectElement>('#speed').value),
+  sequence: 'scenario' as 'scenario' | 'short' | 'full',
+  complete: false,
+  storyTime: 0,
+  mode: 'presentation' as Mode
 };
 const scn = () => scenarios[st.sc];
 /** Authorization, UART and LED are derived from the events up to the current one, so seeking is always consistent. */
@@ -139,12 +176,14 @@ function derived() { let auth = scn().authStart, uart = '', led = '';
 
 function setAppMode(m: Mode) {
   st.mode = m;
-  $('#btn-mode-pres').setAttribute('aria-checked', String(m === 'presentation'));
+  $('#explore').dataset.mode = m;
+  if (m === 'presentation') closeGlossary();
+  $('#btn-mode-pres').setAttribute('aria-pressed', String(m === 'presentation'));
   $('#btn-mode-pres').classList.toggle('active', m === 'presentation');
-  $('#btn-mode-learn').setAttribute('aria-checked', String(m === 'learning'));
+  $('#btn-mode-learn').setAttribute('aria-pressed', String(m === 'learning'));
   $('#btn-mode-learn').classList.toggle('active', m === 'learning');
   paint();
-  renderInspector();
+  if (m === 'learning') renderInspector();
 }
 $('#btn-mode-pres').addEventListener('click', () => setAppMode('presentation'));
 $('#btn-mode-learn').addEventListener('click', () => setAppMode('learning'));
@@ -196,10 +235,20 @@ const link = (id: string) => { const c = byId.get(id); return c ? `<button type=
 const hasRes = (c: Component) => ['lut', 'ff', 'bram', 'lutShare'].some((k) => (c.metrics as Record<string, unknown>)[k] !== undefined);
 const val = (n: number | undefined) => (n === undefined ? NM : fmt(n));
 function stats(c: Component) {
-  if (!hasRes(c)) return `<p class="callout">${esc(c.metrics.note ?? 'No resource figures: this is not a logic block.')}</p>`;
   const m = c.metrics;
-  return `<div class="stats"><div class="stat"><b>${val(m.lut)}</b><span>LUTs</span></div><div class="stat"><b>${val(m.ff)}</b><span>Flip-flops</span></div><div class="stat"><b>${val(m.bram)}</b><span>Block RAMs</span></div></div>
-    ${m.note ? `<p class="muted small">${esc(m.note)}</p>` : ''}`; }
+  const source = c.evidenceRefs.includes('E-UTIL') || c.type === 'router' ? 'E-UTIL' : c.evidenceRefs[0];
+  const report = source && evidence.get(source);
+  const router = c.type === 'router';
+  const basis = router ? 'Equal share of the six-router mesh' : hasRes(c) ? 'Measured after place and route' : 'Resource accounting';
+  const numbers = [
+    ['LUTs', router ? `${fmt(m.lutShare!)} <small>estimate</small>` : val(m.lut)],
+    ['Flip-flops', router ? NM : val(m.ff)],
+    ['Block RAMs', router ? NM : val(m.bram)],
+  ];
+  return `<div class="figure-source">${esc(basis)}${report ? ` · <a href="#results/${esc(source)}">${esc(report.title)}</a>` : ''}</div>
+    <div class="stats">${numbers.map(([label,value]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join('')}</div>
+    ${m.note ? `<p class="muted small">${esc(m.note)}</p>` : ''}`;
+}
 const compact = (c: Component) => !hasRes(c) ? `<small>${c.metrics.note ? (/^Not separately measured/.test(c.metrics.note) ? 'Not separately measured' : esc(c.metrics.note)) : 'Not separately measured'}</small>`
   : `<small>${c.metrics.lut !== undefined ? fmt(c.metrics.lut) + ' LUT' : 'LUT not separately measured'}${c.metrics.ff !== undefined ? ' · ' + fmt(c.metrics.ff) + ' FF' : ''}${c.metrics.bram !== undefined ? ' · ' + c.metrics.bram + ' BRAM' : ''}</small>`;
 const tileComps = (t: number) => components.filter((c) => c.tileId === t);
@@ -226,8 +275,8 @@ function renderInspector() {
   const el = $('#insp'), c = st.sel ? byId.get(st.sel) : null;
   document.querySelectorAll<HTMLElement>('.tilebar [data-tile]').forEach((b) => b.setAttribute('aria-pressed', String(!!c && +b.dataset.tile! === c.tileId)));
   if (!c) {
-    el.innerHTML = `<p class="eyebrow">Explore each tile</p><h2>Pick a tile</h2><p class="purpose">Click a tile above, a block in the 3D view, or any name in the list below. You will see what the tile is for, how much hardware it uses and what it does in the demo.</p>
-    <div class="tilegrid">${tiles.map((t) => `<button type="button" data-tile="${t.id}"><b>Tile ${t.id}</b><span>${esc(t.name)}</span></button>`).join('')}</div>`;
+    el.innerHTML = `<p class="eyebrow">Explore each tile</p><h2>Pick a tile</h2><p class="purpose">Choose a tile above, a block on the chip, or a search result. You will see what the tile is for, how much hardware it uses and what it does in the demo.</p>
+`;
     return;
   }
   if (c.tileId === null) {
@@ -237,8 +286,6 @@ function renderInspector() {
   }
   const t = tiles[c.tileId], prim = byId.get(t.primary)!, parent = c.type === 'sub' && c.parentId ? byId.get(c.parentId)! : null;
   const parts = tileComps(t.id).filter((k) => k.type !== 'sub').concat(t.id === 3 || t.id === 4 ? [byId.get('l2')!] : []);
-  const measuredParts = parts.filter(hasRes);
-  const unmeasuredParts = parts.filter((k) => !hasRes(k));
   const tl = TILES_LEARNING[t.id];
 
   // Learning mode full 9-point educational guide and analogy
@@ -265,36 +312,34 @@ function renderInspector() {
       </div>
     </div>` : '';
 
-  el.innerHTML = `<p class="eyebrow">Tile ${t.id} · position x ${t.x}, y ${t.y}</p>
-    <h2>Tile ${t.id} — ${esc(t.name)}</h2>
-    <p class="purpose">${esc(t.purpose)}</p>
-    ${learnGuideHtml}
-    <div class="main-block-section">
-      <div class="main-block-badge"><strong>Main block: ${esc(prim.name)}</strong> · post-route figures (${esc(build.label)})</div>
-      ${stats(prim)}
-    </div>
-    <div class="breakdown-wrap">
-      <h3>Measured tile resources</h3>
-      <table class="res-table">
-        <thead><tr><th>Component</th><th>LUT</th><th>FF</th><th>BRAM</th></tr></thead>
-        <tbody>
-          ${measuredParts.map((k) => `<tr><td><strong>${esc(k.name)}</strong>${k.id === 'l2' ? ' <small>(shared T3/T4)</small>' : ''}</td><td>${val(k.metrics.lut)}</td><td>${val(k.metrics.ff)}</td><td>${val(k.metrics.bram)}</td></tr>`).join('')}
-        </tbody>
-      </table>
-      ${unmeasuredParts.length ? `<p class="muted small">Additional logic in tile: ${unmeasuredParts.map((u) => esc(u.name)).join(', ')} (${NM}).</p>` : ''}
-      <p class="muted small note">Tile accounting: Lists verified post-route figures per block. Shared engines and unmeasured glue are kept separate rather than summed into an unverified total.</p>
-    </div>
-    <h3>What it does</h3><ul class="does">${t.does.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>
-    <h3>In this demo</h3>${demoRole(t.id)}
-    <div class="selbox"><p class="eyebrow">Selected part${parent ? ` · inside ${esc(parent.name)}` : ''}</p><p class="selname">${esc(c.name)}</p><p>${esc(c.summary)}</p>${c.id !== prim.id ? stats(c) : ''}</div>
+  el.innerHTML = `<p class="eyebrow">Tile ${t.id} · ${esc(t.name)}</p>
+    <h2 class="selname">${esc(c.name)}</h2><p class="purpose">${esc(c.summary)}</p>${stats(c)}
+    ${techDetail(c)}
+    <details class="techd"><summary>Tile ${t.id} context and resource accounting</summary>
+      <p>${esc(t.purpose)}</p>
+      ${c !== prim ? `<h3>${esc(prim.name)} · main block</h3>${stats(prim)}` : ''}
+      <h3>Measured tile resources</h3>${table(['Component', 'LUTs', 'Flip-flops', 'Block RAMs'], parts.filter(p => p.type !== 'router' && p.metrics.lut !== undefined).map(p => [esc(p.name), val(p.metrics.lut), val(p.metrics.ff), val(p.metrics.bram)]))}
+      <ul class="does">${t.does.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
+      <div id="tile-scenario">${demoRole(t.id)}</div>
+    </details>
+    <details class="techd"><summary>Tile learning guide</summary>${learnGuideHtml}</details>
     <h3>Parts in this tile</h3><ul class="parts">${parts.map((k) => `<li><button type="button" data-sel="${esc(k.id)}" aria-current="${k.id === c.id}"><span>${esc(k.name)}${k.id === 'l2' ? ' (shared with tile ' + (t.id === 3 ? 4 : 3) + ')' : ''}</span>${compact(k)}</button>
       ${k.type === 'cpu' ? `<details class="subparts-details"${parent && parent.id === k.id ? ' open' : ''}><summary><small>Subcomponents (${components.filter((s) => s.parentId === k.id).length})</small></summary><ul class="subparts">${components.filter((s) => s.parentId === k.id).map((s) => `<li><button type="button" data-sel="${esc(s.id)}" aria-current="${s.id === c.id}"><span>${esc(s.name)}</span>${compact(s)}</button></li>`).join('')}</ul></details>` : ''}</li>`).join('')}</ul>
-    ${techDetail(c)}`;
+    `;
 }
 
-function select(id: string | null, fromHash = false, fly = true) { st.sel = id && byId.has(id) ? id : null; api?.select(st.sel); api?.focusTile(st.sel ? byId.get(st.sel)!.tileId : null, fly); renderInspector();
+function select(id: string | null, fromHash = false, fly = false) { st.sel = id && byId.has(id) ? id : null; if (st.sel && st.mode !== 'learning') setAppMode('learning'); if (st.sel) $<HTMLDetailsElement>('#inspector').open = true; api?.select(st.sel); api?.focusTile(st.sel ? byId.get(st.sel)!.tileId : null, fly); renderInspector();
   document.querySelectorAll('#list button').forEach((b) => b.setAttribute('aria-current', String((b as HTMLElement).dataset.sel === st.sel)));
-  if (!fromHash) writeHash(); }
+  mesh.select(st.sel);
+  if (!fromHash) {
+    writeHash();
+    if (st.sel) {
+      const spec = $('#insp');
+      spec.focus({preventScroll:true});
+      spec.scrollIntoView({block:'start', behavior:reduce ? 'instant' : 'smooth'});
+    }
+  }
+}
 
 // ---------------------------------------------------------------- searchable, keyboard-operable block list (mirrors the 3D selection)
 function renderList(q = '') { const f = q.trim().toLowerCase();
@@ -305,8 +350,15 @@ document.addEventListener('click', (e) => {
   const b = (e.target as HTMLElement).closest<HTMLElement>('[data-sel],[data-sc],[data-tile],[data-ev],[data-gloss]');
   if (!b) return;
   if (b.dataset.gloss) { openGlossary(b.dataset.gloss); }
-  else if (b.dataset.sel) { stopTour(); if (location.hash.split('/')[0] !== '#explore') location.hash = '#explore'; select(b.dataset.sel); }
-  else if (b.dataset.tile !== undefined) { stopTour(); select(tiles[+b.dataset.tile].primary); }
+  else if (b.dataset.sel) {
+    if (!location.hash.startsWith('#explore')) {
+      returnHash = '';
+      history.pushState(null, '', '#explore');
+      route();
+    }
+    select(b.dataset.sel);
+  }
+  else if (b.dataset.tile !== undefined) { select(tiles[+b.dataset.tile].primary); }
   else if (b.dataset.sc) { const i = scenarios.findIndex((s) => s.id === b.dataset.sc); if (i >= 0) { stopTour(); location.hash = '#explore'; setScenario(i, true); } }
   else if (b.dataset.ev !== undefined) { stopTour(); seek(+b.dataset.ev, true); }
 });
@@ -317,136 +369,268 @@ function paint() {
   const elData = SCENARIO_LEARNING[e.id];
   $('#rauth').textContent = d.auth ? 'authorized' : 'not authorized';
   $('#ruart').textContent = d.uart ? `"${d.uart}"` : 'no output yet';
-  $('#rled').textContent = d.led || 'no pattern yet';
-  $('#where').textContent = `${s.summary} Shown: ${s.where}.`;
-  $('#events').innerHTML = s.events.map((x, i) => `<li><button type="button" data-ev="${i}" aria-current="${i === st.ev ? 'step' : 'false'}"><span class="vc vc-${x.vc}" aria-hidden="true"></span>${esc(x.label)}${x.outcome === 'accepted' ? '' : `<small>${x.outcome}</small>`}</button></li>`).join('');
-
-  // Outcome badge
-  const outcomeBadge = e.outcome === 'accepted'
-    ? `<span class="cap-badge ok">&#10003; Accepted &amp; Verified</span>`
-    : e.outcome === 'refused'
-    ? `<span class="cap-badge fail">&#9940; Refused locally (Blocked)</span>`
-    : `<span class="cap-badge warn">&#9888; Rejected at Quarantine</span>`;
-
-  // Always render .capwho, .capwhat, .capwhy in #cap
-  $('#cap').innerHTML = `
-    <div class="captop">
-      <span class="capmeta">${st.tour ? `Demo · part ${st.sc + 1} of ${scenarios.length}: ${esc(s.name)}` : esc(s.name)} · step ${st.ev + 1} of ${s.events.length}</span>
-      ${outcomeBadge}
-    </div>
-    <p class="transfer-route" aria-label="Transfer path">${e.path.map(id => esc(byId.get(id)?.name ?? id)).join(' → ')}</p>
-    <p class="capwho">${esc(e.who)}</p>
-    <p class="capwhat">${esc(e.plain)}</p>
-    <p class="capwhy"><b>Why it matters:</b> ${esc(e.matters)}</p>`;
-
-  // Educational Learning Mode Card in Timeline
-  const learnBox = $('#learn-timeline-card');
-  if (st.mode === 'learning' && elData) {
-    learnBox.hidden = false;
-    const badgeCls = elData.resultCategory === 'ok' ? 'ok' : elData.resultCategory === 'fail' ? 'fail' : 'warn';
-    learnBox.innerHTML = `
-      <div class="learn-card">
-        <div class="learn-header">
-          <div class="learn-title-group">
-            <span class="learn-tag">Step ${st.ev + 1} of ${s.events.length} Educational Breakdown</span>
-            <h4>${esc(e.label)}: Beginner-Friendly Explanation</h4>
-          </div>
-          <span class="cap-badge ${badgeCls}">${esc(elData.resultStatus)}</span>
-        </div>
-        <div class="learn-grid">
-          <div class="learn-box learn-a">
-            <span class="learn-lbl">A. What is happening?</span>
-            <p>${esc(elData.whatIsHappening)}</p>
-          </div>
-          <div class="learn-box learn-b">
-            <span class="learn-lbl">B. Why is this happening?</span>
-            <p>${esc(elData.whyHappening)}</p>
-          </div>
-          <div class="learn-box learn-c">
-            <span class="learn-lbl">C. How does it work? &amp; Analogy</span>
-            <p>${esc(elData.howItWorks)}</p>
-            <div class="learn-analogy">💡 <b>Analogy:</b> ${esc(elData.analogy)}</div>
-          </div>
-          <div class="learn-box learn-d">
-            <span class="learn-lbl">D. What happens next?</span>
-            <p>${esc(elData.whatHappensNext)}</p>
-          </div>
-          <div class="learn-box learn-e">
-            <span class="learn-lbl">E. Real-world significance</span>
-            <p>${esc(elData.realWorldSignificance)}</p>
-          </div>
-        </div>
-        <div class="audit-card">
-          <div class="audit-head"><b>Security Scenario Audit:</b> Complete Verification Transparency</div>
-          <div class="audit-grid">
-            <div class="audit-cell"><b>Attempted Action:</b> <span>${esc(elData.attemptedAction)}</span></div>
-            <div class="audit-cell"><b>Initiated By:</b> <span>${esc(elData.initiatedBy)}</span></div>
-            <div class="audit-cell"><b>Checks Performed:</b> <span>${esc(elData.checksPerformed)}</span></div>
-            <div class="audit-cell"><b>Checking Component:</b> <span>${esc(elData.checkingComponent)}</span></div>
-            <div class="audit-cell"><b>Result:</b> <span class="audit-val ${badgeCls}">${esc(elData.resultStatus)}</span></div>
-            <div class="audit-cell"><b>Why Result Occurred:</b> <span>${esc(elData.whyResult)}</span></div>
-            <div class="audit-cell wide"><b>Without Security Mechanism:</b> <span>${esc(elData.withoutSecurity)}</span></div>
-          </div>
-        </div>
-      </div>`;
-  } else {
-    learnBox.hidden = true;
-    learnBox.innerHTML = '';
+  const lights = [d.auth ? 'LD0 authorization on' : 'LD0 authorization off'];
+  if (d.led === '0001') lights.push('LD2 Tile 3 pass');
+  if (d.led === '0010') lights.push('RGB Tile 0 refused');
+  $('#rled').textContent = lights.join(' · ');
+  const tileContext = document.getElementById('tile-scenario');
+  const tileId = st.sel ? byId.get(st.sel)?.tileId : null;
+  if (tileContext && tileId != null && tileContext.dataset.event !== e.id) {
+    tileContext.dataset.event = e.id;
+    tileContext.innerHTML = demoRole(tileId);
   }
+  $('#where').textContent = `${s.summary} Shown: ${s.where}.`;
 
+
+  const short = st.sequence === 'short';
+  const frame = storyFrame(st.storyTime);
+  $('#where').hidden = short;
+  const setup = short && frame.beat.id === 'setup';
+  $('#narr').closest('details')!.hidden = setup;
+  $('#demo-guide').hidden = !short;
+  const note = fieldNotes[setup ? 'setup' : e.id];
+  setCopy($('#context-heading'), note[0]);
+  setCopy($('#context-body'), note[1]);
+  renderSteps();
+  const learnBox = $('#learn-timeline-card');
+  if (st.mode === 'learning') {
+    const rows = (values: string[][]) => values.map(([title, detail]) => `<div><dt>${esc(title)}</dt><dd>${esc(detail)}</dd></div>`).join('');
+    $('#event-title').textContent = setup ? 'Before the first packet' : e.label;
+    $('#audit-guide').hidden = setup || !elData;
+    if (setup) {
+      learnBox.innerHTML = '<dl>' + rows([
+        ['What to watch', 'Find CPU A on Tile 3, CPU B on Tile 0 and shared memory on Tile 2. A tile is one part of the chip.'],
+        ['What a write means', 'A processor asks memory to save a number at an address. Both processors use address 0x22000100.'],
+        ['Why permission matters', 'Tile 3 already has a grant. Tile 0 has no grant. The bridge beside each processor checks this before sending a packet.'],
+      ]) + '</dl>';
+    } else if (elData) {
+      learnBox.innerHTML = '<dl>' + rows([
+        ['What happens', elData.whatIsHappening], ['Why it happens', elData.whyHappening],
+        ['How it works', elData.howItWorks], ['An everyday comparison', elData.analogy],
+        ['What comes next', elData.whatHappensNext], ['Why it matters', elData.realWorldSignificance],
+      ]) + '</dl>';
+      $('#audit-facts').innerHTML = rows([
+        ['Who starts it', elData.initiatedBy], ['Requested action', elData.attemptedAction],
+        ['Where the check happens', elData.checkingComponent], ['Checks', elData.checksPerformed],
+        ['Outcome', elData.resultStatus], ['Reason', elData.whyResult], ['Without the check', elData.withoutSecurity],
+      ]);
+    } else learnBox.textContent = e.what;
+  }
   const route = e.path.map((p) => byId.get(p)!.type === 'router' ? p.toUpperCase() : byId.get(p)!.name).join(' → ');
   $('#narr').innerHTML = `<p><strong>${esc(e.label)}.</strong> ${esc(e.what)} ${esc(e.why)}</p>
     <p class="muted"><span class="mono">${esc(vcInfo[e.vc as VcId].name)}</span> carries ${esc(vcInfo[e.vc as VcId].carries)} (${esc(vcInfo[e.vc as VcId].shape)}). Route: ${esc(route)}.
     ${e.outcome === 'accepted' ? '' : `<strong>Outcome: ${e.outcome}.</strong> The stop sign marks where it ends.`}</p>`;
   document.querySelectorAll('#scn button').forEach((b, i) => b.setAttribute('aria-pressed', String(i === st.sc)));
-  $('#bplay').textContent = st.playing ? 'Pause' : 'Play';
-  $('#bdemo').textContent = st.tour ? 'Stop the demo' : 'Watch the demo';
-  if (st.tour && st.sel !== e.actor) select(e.actor, false, false); else if (st.sel) renderInspector();
-  api?.setFocus(e.focus);
-  api?.showEvent(e, Math.min(st.t, 1));
+  $('#bplay').textContent = st.playing ? 'Pause' : st.complete ? 'Replay' : reduce ? 'Step' : (st.sequence === 'short' ? st.storyTime : elapsed) > 0 ? 'Resume' : 'Play';
+  $('#bdemo').textContent = st.sequence === 'short' && st.playing ? 'Pause demo' : 'Watch the demo';
+  $('#bfull').textContent = st.sequence === 'full' && st.playing ? 'Pause walkthrough' : 'Full walkthrough';
+
+  api?.setFocus(short && frame.beat.id === 'setup' ? ['cpuA','cpuB'] : st.t >= 1 ? [e.path[e.path.length - 1]] : [e.actor]);
+  updateFrame();
   api?.setLeds(d);
   syncScrub();
 }
 
 const scrub = $<HTMLInputElement>('#scrub');
-function syncScrub() { const n = scn().events.length; scrub.value = String(Math.round(((st.ev + Math.min(st.t, 1)) / n) * 1000)); scrub.setAttribute('aria-valuetext', `step ${st.ev + 1} of ${n}: ${scn().events[st.ev].label}`); }
+let stepKey = '';
+function renderSteps() {
+  const short = st.sequence === 'short';
+  const list = playlist();
+  const index = short ? story.indexOf(storyFrame(st.storyTime).beat) : list.findIndex(x => x.sc === st.sc && x.ev === st.ev);
+  const key = short ? 'short' : st.sequence === 'full' ? 'full' : scn().id;
+  const names = short ? story.map(x => x.name) : list.map(x => scenarios[x.sc].events[x.ev].label);
+  if (key !== stepKey) {
+    stepKey = key;
+    $('#stepchoices').innerHTML = names.map((name,i) => `<button type="button" data-step="${i}">${esc(name)}</button>`).join('');
+  }
+  $('#stepcount').textContent = `${index + 1} of ${names.length} · ${names[index]}`;
+  Array.from($('#stepchoices').children).forEach((b,i) => b.setAttribute('aria-current', i === index ? 'step' : 'false'));
+  $('#stepchoices').classList.toggle('long-list', names.length > 4);
+  $('#bprev').toggleAttribute('disabled', index === 0);
+}
+$('#stepchoices').addEventListener('click', event => {
+  const button = (event.target as HTMLElement).closest<HTMLElement>('[data-step]');
+  if (!button) return;
+  const index = Number(button.dataset.step);
+  if (st.sequence === 'short') jumpStory(index);
+  else { const step = playlist()[index]; st.sc = step.sc; seek(step.ev, false); writeHash(); }
+});
+function syncScrub() {
+  const short = st.sequence === 'short';
+  const fullIndex = st.sequence === 'full' ? allSteps.findIndex(x => x.sc === st.sc && x.ev === st.ev) : -1;
+  const fraction = fullIndex >= 0 ? (fullIndex + st.t) / allSteps.length : short ? st.storyTime / storyLength : (st.ev + st.t) / scn().events.length;
+  scrub.value = String(Math.round(fraction * 1000));
+  scrub.setAttribute('aria-valuetext', short ? `${(st.storyTime / 1000).toFixed(1)} seconds, ${storyFrame(st.storyTime).beat.name}` : scn().events[st.ev].label);
+}
+function setCopy(el: HTMLElement, text: string) {
+  if (el.textContent !== text) el.textContent = text;
+}
+const capMeta = $('#cap .capmeta'), capTitle = $('#cap .capwhat'), capDetail = $('#cap .capexplain'), packetPlace = $('#packet-place');
+function updateFrame() {
+  const event = scn().events[st.ev];
+  const setup = st.sequence === 'short' && storyFrame(st.storyTime).beat.id === 'setup';
+  let node = '';
+  if (setup) {
+    if (useMesh) mesh.render(null, 0);
+    else api?.showEvent(null, 0);
+  } else node = showFrame(event, st.t);
+  const short = st.sequence === 'short';
+  const frame = short ? storyFrame(st.storyTime) : null;
+  const beat = frame?.beat.id ?? ({'acc-1':'write', 'acc-2':'ack', 'ref-1':'refusal'} as Record<string,string>)[event.id];
+  const copy = beat ? storyNarration(beat, node, st.t >= 1) : [st.t >= 1 ? event.plain : event.label, st.t >= 1 ? event.matters : event.who + ' · ' + event.what];
+  setCopy(capMeta, frame ? `Step ${story.indexOf(frame.beat) + 1} of ${story.length} · ${frame.beat.name}` : scn().name);
+  setCopy(capTitle, copy[0]); setCopy(capDetail, copy[1]);
+  packetPlace.hidden = !node;
+  if (node) {
+    const label = /^r\d$/.test(node) ? `Router ${node.slice(1)}` : byId.get(node)?.name ?? node;
+    setCopy(packetPlace, (event.vc === 'local' ? 'Local request' : event.id === 'acc-2' ? 'Reply' : 'Transfer') + ' · ' + label);
+  }
+}
+const storyEvents = new Map(scenarios.flatMap((scenario, sc) =>
+  scenario.events.map((event, ev) => [event.id, {sc, ev}] as const)));
+function sampleStory(ms: number, force = false) {
+  const previous = storyFrame(st.storyTime);
+  const frame = storyFrame(ms);
+  st.storyTime = frame.time;
+  const event = storyEvents.get(frame.beat.event)!;
+  st.sc = event.sc; st.ev = event.ev; st.t = frame.progress;
+  st.complete = frame.time === storyLength;
+  if (st.complete) st.playing = false;
+  if (force || previous.beat !== frame.beat || previous.arrived !== frame.arrived || st.complete) {
+    paint(); writeHash();
+  } else { updateFrame(); syncScrub(); }
+}
+function jumpStory(index: number, play = false) {
+  st.playing = play && !reduce;
+  const beat = story[index];
+  // Manual stepping exposes the result even when motion is reduced.
+  sampleStory(reduce && index > 0 ? beat.arrival : beat.start, true);
+  schedule();
+}
 /** Scrubbing sets (event, progress) directly; everything shown is recomputed from that pair. */
-scrub.addEventListener('input', () => { stopTour(); const n = scn().events.length, x = Math.min(0.9999, +scrub.value / 1000) * n; st.playing = false; st.ev = Math.floor(x); st.t = reduce ? 1 : x - st.ev; if (+scrub.value >= 1000) { st.ev = n - 1; st.t = 1; } paint(); });
-function seek(i: number, play: boolean) { const n = scn().events.length; st.ev = Math.max(0, Math.min(n - 1, i)); st.t = reduce ? 1 : 0; st.playing = play && !reduce; paint(); if (st.playing) loop(); }
+const allSteps = scenarios.flatMap((scenario, sc) => scenario.events.map((event, ev) => ({ sc, ev, id: event.id })));
+
+function playlist() {
+
+  if (st.sequence === 'full') return allSteps;
+  return allSteps.filter(step => step.sc === st.sc);
+}
+let elapsed = 0, raf = 0, lastFrame = 0;
+function duration() { return 1500 + scn().events[st.ev].path.length * 420; }
+function stopTour() { st.sequence = 'scenario'; }
+function seek(i: number, play: boolean) {
+  cancelAnimationFrame(raf);
+  st.ev = Math.max(0, Math.min(scn().events.length - 1, i));
+  st.t = reduce ? 1 : 0;
+  elapsed = st.t * duration();
+  st.complete = false;
+  st.playing = play && !reduce;
+  paint();
+  schedule();
+}
 function setScenario(i: number, play: boolean) { st.sc = i; seek(0, play); writeHash(); }
-function stopTour() { if (st.tour) { st.tour = false; $('#bdemo').textContent = 'Watch the demo'; } }
-let raf = 0, lastT = 0, hold = 0;
-function loop() { cancelAnimationFrame(raf); lastT = performance.now(); const step = (now: number) => { if (!st.playing) return; const dt = Math.min(now - lastT, 80); lastT = now;
-    const e: Ev = scn().events[st.ev], dur = (st.tour ? 1500 : 900) + e.path.length * 420, was = st.t; st.t = Math.min(1.6, st.t + (dt * st.speed) / dur);
-    if (was < 1 && st.t >= 1) paint(); else { api?.showEvent(e, Math.min(st.t, 1)); syncScrub(); }
-    if (st.t >= 1.6) { hold += dt;
-      if (hold > (st.tour ? 1800 : 0)) { hold = 0;
-        if (st.ev < scn().events.length - 1) { st.ev++; st.t = 0; paint(); }
-        else if (st.tour && st.sc < scenarios.length - 1) { st.sc++; st.ev = 0; st.t = 0; writeHash(); paint(); }
-        else { st.playing = false; st.t = 1; stopTour(); paint(); return; } } }
-    raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); }
+function stepBy(direction: number, play = false) {
+  if (st.sequence === 'short') {
+    const index = story.indexOf(storyFrame(st.storyTime).beat) + direction;
+    if (index === story.length) sampleStory(storyLength, true);
+    else if (index >= 0) jumpStory(index);
+    return;
+  }
+  const steps = playlist();
+  const i = steps.findIndex(step => step.sc === st.sc && step.ev === st.ev);
+  const next = steps[i + direction];
+  if (next) {
+    st.sc = next.sc; seek(next.ev, play); writeHash();
+  } else if (direction > 0) {
+    st.playing = false; st.complete = true; st.t = 1; paint();
+  }
+}
+function schedule() {
+  cancelAnimationFrame(raf);
+  if (!st.playing || document.hidden) return;
+  lastFrame = performance.now();
+  raf = requestAnimationFrame(tick);
+}
+function tick(now: number) {
+  if (!st.playing || document.hidden) return;
+  if (st.sequence === 'short') {
+    const delta = (now - lastFrame) * st.speed;
+    lastFrame = now;
+    sampleStory(st.storyTime + delta);
+    if (st.playing) raf = requestAnimationFrame(tick);
+    return;
+  }
+  elapsed += (now - lastFrame) * st.speed;
+  lastFrame = now;
+  const previous = st.t;
+  st.t = Math.min(1, elapsed / duration());
+  if (previous < 1 && st.t === 1) {
+    // Start the caption hold when the final packet position first reaches the screen.
+    elapsed = duration();
+    paint();
+  }
+  else { updateFrame(); syncScrub(); }
+  if (elapsed >= duration() + 1400) stepBy(1, true);
+  else raf = requestAnimationFrame(tick);
+}
+document.addEventListener('visibilitychange', schedule);
+function restart() {
+  if (st.sequence === 'short') { jumpStory(0, true); return; }
+  const first = playlist()[0];
+  st.sc = first.sc; seek(first.ev, true); writeHash();
+}
+scrub.addEventListener('input', () => {
+  if (st.sequence === 'short') {
+    st.playing = false; sampleStory(Number(scrub.value) * storyLength / 1000, true); schedule(); return;
+  }
+  const choices = playlist();
+  const x = Number(scrub.value) / 1000 * choices.length;
+  const index = Math.min(choices.length - 1, Math.floor(x));
+  st.sc = choices[index].sc; st.ev = choices[index].ev;
+  st.t = reduce ? 1 : x - index;
+  elapsed = st.t * duration();
+  st.playing = st.complete = false;
+  schedule(); paint(); writeHash();
+});
 $('#scn').innerHTML = scenarios.map((s, i) => `<button type="button" data-scn="${i}">${i + 1}. ${esc(s.name)}</button>`).join('');
 $('#scn').addEventListener('click', (e) => { const b = (e.target as HTMLElement).closest<HTMLElement>('[data-scn]'); if (b) { stopTour(); setScenario(+b.dataset.scn!, true); } });
-$('#bplay').addEventListener('click', () => { if (reduce) { seek(st.ev + 1 < scn().events.length ? st.ev + 1 : 0, false); return; }
-  if (!st.playing && st.t >= 1 && st.ev === scn().events.length - 1) { seek(0, true); return; } if (!st.playing && st.t >= 1) { seek(st.ev + 1, true); return; } st.playing = !st.playing; if (!st.playing) stopTour(); paint(); if (st.playing) loop(); });
-$('#bnext').addEventListener('click', () => { stopTour(); seek(st.ev + 1, false); }); $('#bprev').addEventListener('click', () => { stopTour(); seek(st.ev - 1, false); }); $('#brestart').addEventListener('click', () => { stopTour(); seek(0, true); });
-$('#speed').addEventListener('change', (e) => { st.speed = parseFloat((e.target as HTMLSelectElement).value) || 1; });
-/** Watch the demo: all six scenarios in order, the caption and the tile card following whoever acts. */
-$('#bdemo').addEventListener('click', () => {
-  if (!api) { fallbackHow?.go(0, true); $('#stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); return; }
-  if (st.tour) { stopTour(); st.playing = false; paint(); return; }
-  st.tour = true; $('#bdemo').textContent = 'Stop the demo'; api.setView('home'); st.sc = 0; seek(0, true); writeHash(); $('#stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); });
+$('#bplay').addEventListener('click', () => {
+  if (st.complete) { restart(); return; }
+  if (reduce) { stepBy(1); return; }
+  st.playing = !st.playing; paint(); schedule();
+});
+$('#bnext').addEventListener('click', () => stepBy(1));
+$('#bprev').addEventListener('click', () => stepBy(-1));
+$('#brestart').addEventListener('click', restart);
+$('#speed').addEventListener('change', (e) => { st.speed = Number((e.target as HTMLSelectElement).value); });
+function startSequence(sequence: 'short' | 'full') {
+  if (st.sequence === sequence && st.playing) {
+    st.playing = false; schedule(); paint(); return;
+  }
+  st.sequence = sequence;
+  if (sequence === 'full') setAppMode('learning');
+  cameraView('top', true);
+  restart();
+  $('#stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+}
+$('#bdemo').addEventListener('click', () => startSequence('short'));
+$('#bfull').addEventListener('click', () => startSequence('full'));
 
 // ---------------------------------------------------------------- camera and view controls
-$('#view').addEventListener('change', (e) => api?.setView((e.target as HTMLSelectElement).value));
+function cameraView(name: string, instant = false) {
+  $<HTMLSelectElement>('#view').value = name;
+  api?.setView(name, instant);
+}
+$('#view').addEventListener('change', (e) => cameraView((e.target as HTMLSelectElement).value));
 document.querySelector('.cambar')!.addEventListener('click', (e) => { const b = (e.target as HTMLElement).closest<HTMLElement>('button'); if (!b) return;
+  if (b.dataset.preset) cameraView(b.dataset.preset);
   if (b.dataset.cam) api?.stepCamera(b.dataset.cam);
   if (b.id === 'blogical') { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); api?.setLogical(on);
     $('#repr').textContent = on ? 'Logical view: blocks, links and routes follow the RTL; the layout is a diagram, not a physical floorplan.' : 'Conceptual drawing: block sizes follow measured LUT counts; positions are illustrative, not a place-and-route floorplan.'; }
   if (b.id === 'blabels') { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); api?.setLabels(on); } });
-api?.onPick((id) => { stopTour(); select(id); });
-$('#stage').addEventListener('keydown', (e) => { const k: Record<string, string> = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', '+': 'in', '=': 'in', '-': 'out' };
-  if (k[e.key]) { api?.stepCamera(k[e.key]); e.preventDefault(); } else if (e.key === 'Home') { api?.setView('home'); e.preventDefault(); } });
+api?.onPick((id) => select(id, false, false));
+$('#stage').addEventListener('keydown', (e) => { if (useMesh || e.target !== e.currentTarget) return; const k: Record<string, string> = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', '+': 'in', '=': 'in', '-': 'out' };
+  if (k[e.key]) { api?.stepCamera(k[e.key]); e.preventDefault(); } else if (e.key === 'Home') { cameraView('top'); e.preventDefault(); } });
 api?.onHover((id, x, y) => { const t = $('#tip'); if (!id) { t.hidden = true; return; } const c = byId.get(id); t.textContent = c ? (c.tileId !== null ? `Tile ${c.tileId} · ${c.name}` : c.name) : id; t.hidden = false; t.style.transform = `translate(${x + 14}px,${Math.max(4, y - 30)}px)`; });
 
 // ---------------------------------------------------------------- pages
@@ -500,11 +684,11 @@ const PAGES: Record<string, () => string> = {
     <div class="overview-steps">
       <div class="ov-step"><b>1. Boot &amp; Measure</b><p>At startup, Tile 3 computes a digital fingerprint (hash) of its initial code. Any modification alters this fingerprint.</p></div>
       <div class="ov-step"><b>2. Challenge &amp; Response</b><p>Tile 4 (Root of Trust) issues a fresh challenge question. Tile 3 seals its fingerprint with a secret key and returns it.</p></div>
-      <div class="ov-step"><b>3. Access Grant</b><p>Tile 4 verifies the signature against its master record. If valid, Tile 4 sends GRANT and unlocks Tile 3’s network gate.</p></div>
+      <div class="ov-step"><b>3. Access Grant</b><p>Tile 4 checks the keyed tag and expected firmware measurement. If valid, Tile 4 sends GRANT and unlocks Tile 3’s network gate.</p></div>
       <div class="ov-step"><b>4. Guarded Memory Access</b><p>Tile 3 writes to shared memory. The Memory Front End re-checks authorization at the moment of access.</p></div>
       <div class="ov-step"><b>5. Local Refusal of Unauthorized Units</b><p>Tile 0 was never authorized. Its requests are halted right at its own local bridge; zero packets enter the network.</p></div>
-      <div class="ov-step"><b>6. Dynamic Revocation</b><p>Button 2 triggers REVOKE. Privileges are revoked instantly in real time without needing to reboot the chip.</p></div>
-      <div class="ov-step"><b>7. Ingress Quarantine</b><p>Fake or replayed external packets sent to Tile 5 are detected by the quarantine filter and destroyed.</p></div>
+      <div class="ov-step"><b>6. Dynamic Revocation</b><p>Button 2 triggers REVOKE. Once Tile 3 applies the revocation, its bridge refuses the next request.</p></div>
+      <div class="ov-step"><b>7. Ingress Quarantine</b><p>The simulated forged packet is stopped at Tile 5. Its external injection port is tied off in the board image.</p></div>
     </div>
     <p><a class="cta" href="#explore">Try the Interactive 3D Demonstration &rarr;</a></p>`,
 
@@ -563,9 +747,9 @@ const PAGES: Record<string, () => string> = {
     <div class="cols"><div>
     <h2>What works</h2><ul class="works">${results.scope.filter((s) => s.status === 'Built and routed' || s.status === 'Shown in simulation').map((s) => `<li><b>${esc(s.item)}</b><small>${esc(s.status)}${s.note ? ' · ' + esc(s.note) : ''}</small></li>`).join('')}</ul>
     </div><div>
-    <h2>Cost of the security logic</h2><p>Compared with the same network and memory without attestation (a research build, never a release image):</p>
+    <h2>Cost of the security logic</h2><p>The area and slack comparison uses an earlier FPGA research build. Latency and throughput come from a matched simulation of 64 transactions per mode.</p>
     ${table(['Measure', 'Secure', 'Without'], results.comparison.rows.map((r) => [esc(r.metric), esc(r.secure), esc(r.baseline)]))}
-    <h2>On the board</h2><p>An image from 7 November was reported as passing on the board by the project owner (observations not itemised). The current 15 November image has not yet been run on the board.</p>
+    <p><a href="https://github.com/arnav1609/Pqattest_Website/blob/a2f7499f6c3c049361c063b20f1aac93d99c71e7/Arnav_Website_Revision10_Handoff_20261115/evidence/reports/I27_R2_GATE_20261114.md">Matched simulation report</a></p><h2>On the board</h2><p>An image from 7 November was reported as passing on the board by the project owner (observations not itemised). The current 15 November image has board validation pending. <a href="https://github.com/arnav1609/Pqattest_Website/blob/a2f7499f6c3c049361c063b20f1aac93d99c71e7/Arnav_Website_Revision10_Handoff_20261115/evidence/reports/HARDWARE_RUN_20261107.md">Historical board report</a></p>
     </div></div>
     <details class="evid"><summary>Full build and verification evidence</summary>
     <h2>Builds</h2>${table(['Build', 'Status', 'LUTs', 'Flip-flops', 'Block RAM', 'Setup slack (ns)', 'Hold slack (ns)', 'Board'],
@@ -573,14 +757,15 @@ const PAGES: Record<string, () => string> = {
     <p class="muted">The hold margin of the current build (+0.007 ns) is thin but positive. Each build embeds its build time, so two builds of the same sources produce different image files.</p>
     <h2>Checks on the current build</h2>${table(['Check', 'Result', 'Source'], results.checks.map((c) => [esc(c.name), esc(c.value), refName(c.ref)]))}
     <h2>Comparison sources</h2><p>${esc(results.comparison.note)}</p>${table(['Measure', 'Source'], results.comparison.rows.map((r) => [esc(r.metric), refName(r.ref)]))}
-    <h2>Evidence used on this site</h2>${table(['Evidence', 'Kind', 'Date', 'Build', 'What it shows', 'Limits'], [...evidence.values()].map((e) => [esc(e.title), esc(e.kind), esc(e.date), esc(LABEL[e.currency]), esc(e.says), esc(e.limits)]))}
+    <h2>Evidence used on this site</h2><p><a href="https://github.com/arnav1609/Pqattest_Website/blob/a2f7499f6c3c049361c063b20f1aac93d99c71e7/Arnav_Website_Revision10_Handoff_20261115/evidence/NOC_PQATTEST.runs/impl_merged/gate/util_hier_routed.rpt">Read the Revision 10 hierarchical utilization report on GitHub</a></p>${table(['Evidence', 'Kind', 'Date', 'Build', 'What it shows', 'Limits'], [...evidence.values()].map((e) => [`<span id="${esc(e.id)}">${esc(e.title)}</span>`, esc(e.kind), esc(e.date), esc(LABEL[e.currency]), esc(e.says), esc(e.limits)]))}
     <div id="dev"></div></details>`,
 
   scope: () => `<p class="eyebrow">Project scope</p><h1>Planned, built, shown, pending</h1>
     <p class="lead">The original proposal against what exists today. Items marked "not built" were proposed and are not part of this prototype.</p>
     ${table(['Item', 'Status', 'Note'], results.scope.map((s) => [esc(s.item), `<span class="st st-${s.status.toLowerCase().replace(/[^a-z]+/g, '-')}">${esc(s.status)}</span>`, esc(s.note)]))}
     <h2>What comes next</h2><ol><li>Run the current image on the board and record each observation against the image it was made from.</li>
-    <li>Finish the independent RTL sign-off review that is in progress.</li><li>Decide the scope of an ASIC flow (RTL to GDSII). That work has not started.</li></ol>`
+    <li>Finish the independent RTL sign-off review that is in progress.</li><li>Decide the scope of an ASIC flow (RTL to GDSII). That work has not started.</li></ol>
+    <h2>Cleanroom image credit</h2><p>The introductory illustration comes from the project asset <code>cleanroom-photo.webp</code>, added in revision <code>b49af72</code>. The equipment bears ASML branding. The original creator and license are undocumented.</p>`
 };
 
 async function devBlock() { if (__PUBLIC_SAFE__) return; const el = document.getElementById('dev'); if (!el) return; const dev = (await import('../data/evidence.dev.json')).default;
@@ -593,10 +778,30 @@ const displayRoom = mountRoom(() => {
   history.replaceState(null, '', '#inspect');
   route();
   return api?.overheadDie();
-}, () => api?.finishEntrance());
+}, () => {
+  api?.finishEntrance();
+  $('#stage').focus({ preventScroll: true });
+});
 let writing = false, disposeHow: (() => void) | null = null;
-function writeHash() { if ((location.hash.split('/')[0] || '#explore') !== '#explore') return; const h = `#explore/${scn().id}${st.sel ? '/' + st.sel : ''}`; if (location.hash !== h) { writing = true; try { history.replaceState(null, '', h); } catch { /* sandboxed viewers may refuse */ } writing = false; } }
-function route() { if (writing) return; const [requested, a, b] = location.hash.slice(1).split('/');
+let returnHash = '';
+function explorerHash() {
+  const step = st.sequence === 'short' ? storyFrame(st.storyTime).beat.id : scn().events[st.ev].id;
+  const params = new URLSearchParams({step, tour: st.sequence});
+  return `#explore/${scn().id}${st.sel ? '/' + st.sel : ''}?${params}`;
+}
+function writeHash() {
+  if (!location.hash.startsWith('#explore')) return;
+  const h = explorerHash();
+  if (location.hash === h) return;
+  writing = true;
+  try { history.replaceState(null, '', h); } catch { /* restricted preview */ }
+  writing = false;
+}
+function route() {
+  if (writing) return;
+  const [path, query] = location.hash.slice(1).split('?');
+  const [requested,a,b] = path.split('/');
+  const params = new URLSearchParams(query);
   const name = !requested && !introComplete ? 'intro' : requested === 'cleanroom' || !requested ? 'explore' : requested;
   if (name !== 'intro' || requested) {
     introComplete = true;
@@ -606,11 +811,17 @@ function route() { if (writing) return; const [requested, a, b] = location.hash.
   const inRoom = name === 'intro' && !requested && !introComplete; displayRoom(inRoom); $('#explore').hidden = !!page || inRoom; $('#page').hidden = !page;
   document.querySelectorAll('#nav a').forEach((l) => l.setAttribute('aria-current', String(l.getAttribute('href') === '#' + (page || inRoom ? name : 'explore') ? 'page' : 'false')));
   disposeHow?.(); disposeHow = null;
-  if (inRoom) {stopTour(); st.playing=false; requestAnimationFrame(() => { if (document.body.classList.contains('intro-only')) api?.warmEntrance(); }); return;}
+  if (inRoom) {st.playing=false; requestAnimationFrame(() => { if (document.body.classList.contains('intro-only')) api?.warmEntrance(); }); return;}
   if (page) {
-    stopTour();
+    if (!returnHash) returnHash = explorerHash();
+    st.playing = false; schedule();
     $('#page').innerHTML = page();
     void devBlock();
+    if (name === 'results' && a && evidence.has(a)) {
+      const section = $('.evid') as HTMLDetailsElement;
+      section.open = true;
+      requestAnimationFrame(() => document.getElementById(a)?.scrollIntoView({block: 'center'}));
+    }
     if (name === 'how') disposeHow = mountHowAnimation($('#howfig'), reduce);
     if (name === 'glossary') {
       const gInput = $<HTMLInputElement>('#gsearch'), grid = $('#gloss-grid-main');
@@ -640,7 +851,31 @@ function route() { if (writing) return; const [requested, a, b] = location.hash.
     history.replaceState(null, '', '#explore');
     $('#stage').scrollIntoView({block:'center', behavior: 'instant'});
   }
-  const i = scenarios.findIndex((s) => s.id === a); if (i >= 0 && i !== st.sc) { st.sc = i; seek(0, false); } if (b !== undefined || st.sel) select(b ?? null, true); }
+  if (returnHash && (path === 'explore' || location.hash === returnHash)) {
+    returnHash = ''; paint(); writeHash(); return;
+  }
+  returnHash = '';
+  const sc = scenarios.findIndex(s => s.id === a);
+  if (sc >= 0) {
+    const index = story.findIndex(x => x.id === params.get('step'));
+    if (params.get('tour') === 'short' && index >= 0) {
+      st.sequence = 'short'; jumpStory(index);
+    } else {
+      st.sequence = params.get('tour') === 'full' ? 'full' : 'scenario';
+      if (st.sequence === 'full') setAppMode('learning');
+      st.sc = sc;
+      const ev = scn().events.findIndex(e => e.id === params.get('step'));
+      seek(Math.max(0, ev), false);
+    }
+    select(b ?? null, true);
+    if (params.has('step')) writeHash();
+    if (!params.has('step') && !b) setAppMode('learning');
+  }
+}
 window.addEventListener('hashchange', route);
-renderList(); renderInspector(); seek(0, false); route();
-(window as unknown as Record<string, unknown>).__pq = { api, st, select, seek, setScenario, setAppMode, derived, ready: true };
+renderList();
+st.sequence = 'short';
+const opening = storyEvents.get(story[0].event)!;
+st.sc = opening.sc; st.ev = opening.ev; st.t = 0;
+setAppMode('presentation'); route();
+(window as unknown as Record<string, unknown>).__pq = { get api() { return api; }, st, select, seek, setScenario, setAppMode, derived, ready: true };

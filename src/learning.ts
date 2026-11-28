@@ -181,7 +181,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   {
     term: 'KMAC128 (Keyed Message Authentication Code)',
     category: 'Security',
-    def: 'A cryptographic algorithm based on SHA3 that uses a secret key to create a tamper-proof digital seal on a message.',
+    def: 'A keyed message authentication code built from Keccak. A receiver with the shared key can check a message and its tag.',
     analogy: 'Like stamping an official document with a royal wax seal using an exclusive, secretive signet ring.',
     inThisChip: 'Used to authenticate packets between Tile 3 and Tile 4 so no unauthorized entity can forge attestation messages.'
   },
@@ -190,13 +190,13 @@ export const GLOSSARY: GlossaryEntry[] = [
     acronym: 'PQC',
     category: 'Security',
     def: 'Next-generation cryptographic algorithms engineered to resist attacks from future quantum computers, which could easily crack conventional RSA and ECC encryption.',
-    analogy: 'Like upgrading from standard metal locks to quantum-proof biometric vaults before thieves invent quantum lockpicks.',
+    analogy: 'A design can reserve space for a new security mechanism before that mechanism is implemented.',
     inThisChip: 'The prototype architecture was designed for post-quantum attestation; this FPGA build implements the foundational SHA3/KMAC symmetric pipeline.'
   },
   {
     term: 'Cryptographic Nonce / Challenge',
     category: 'Security',
-    def: 'A unique, fresh random or sequential number used once in a cryptographic exchange to guarantee that old, intercepted messages cannot be re-sent by an attacker.',
+    def: 'A value used once for an exchange. The verifier checks the answer against the current challenge so an old answer fails that check.',
     analogy: 'Like a security desk asking you today’s randomly chosen daily secret password rather than a password you used yesterday.',
     inThisChip: 'Tile 4 generates a fresh 224-bit challenge nonce so an adversary cannot record an old valid response and replay it later.'
   },
@@ -396,14 +396,14 @@ export const TILES_LEARNING: Record<number, TileLearning> = {
     infoEnters: 'System clock, startup firmware, and cryptographic CHALLENGE, GRANT, or REVOKE packets from Tile 4.',
     whatHappensInside: 'Hashes its complete 16KB instruction memory (4,096 words) with a dedicated SHA3-256 engine to create an unforgeable fingerprint, packages it into a 64-byte field, seals the response with KMAC128, and unlocks its network bridge once granted access. Instruction fetches are constrained to IMEM.',
     infoLeaves: 'RESPONSE packets containing cryptographic proof to Tile 4, and authorized memory read/write requests to Tile 2.',
-    securityBenefit: 'Guarantees that only genuine hardware running untampered, verified software can access the chip’s shared resources.',
+    securityBenefit: 'Links the admission decision to the measured instruction image and the response authenticated with the tile key.',
     ifCompromised: 'If an attacker alters even a single bit of CPU A’s firmware, its cryptographic fingerprint changes, verification fails, and it is permanently locked out of shared memory.'
   },
   4: {
     tileId: 4,
     name: 'Root of Trust Verifier (Security Authority)',
     analogyTitle: 'The Chief Security Officer',
-    analogyText: 'Like the master security department of an intelligence agency. It maintains master records, issues unguessable challenge quizzes, verifies cryptographic signatures, hands out access badges, and can instantly revoke them if a threat is detected.',
+    analogyText: 'Like a badge office that checks credentials, grants access and sends a cancellation to the door controller.',
     whatIsIt: 'A dedicated, tamper-resistant hardware security controller acting as the foundational trust anchor for the entire SoC.',
     responsibility: 'Issuing fresh challenges to processor tiles, verifying returned cryptographic proofs against master criteria, granting access permissions, and revoking privileges upon button press or error.',
     whyNeeded: 'Without a trusted central authority, there is no objective, unbribable way to determine which processors are genuine and which have been compromised.',
@@ -425,7 +425,7 @@ export const TILES_LEARNING: Record<number, TileLearning> = {
     interaction: 'Attempts to inject packets into the on-chip network interface, where the quarantine engine intercepts and analyzes them.',
     infoEnters: 'Raw external packet streams, including forged control packets, replayed tokens, and corrupted sequence numbers.',
     whatHappensInside: 'Holds incoming packets in an isolation buffer, verifies the Layer-2 authentication tag and sequence number freshness, and drops invalid packets immediately.',
-    infoLeaves: 'Nothing during an attack! All forged or unauthorized packets are discarded at the quarantine barrier.',
+    infoLeaves: 'In the simulated forged-packet test, no injected packet is forwarded.',
     securityBenefit: 'Perimeter immunity. Malicious external inputs are filtered out before they can enter internal network routers or disrupt processors.',
     ifCompromised: 'On the physical board, this port is permanently disabled (tied off) for safety. In simulation, it proves the quarantine hardware works with 100% effectiveness.'
   }
@@ -473,7 +473,7 @@ export const SCENARIO_LEARNING: Record<string, EventLearning> = {
     whyHappening: 'Tile 3 must prove two things: that it is genuine hardware holding the master secret key, and that its firmware instructions have not been altered.',
     howItWorks: 'The PQ-Attest endpoint combines the SHA3-256 firmware measurement with the challenge nonce received from Tile 4, signs it using KMAC128 and its secret key, and sends the 512-bit packet back across Router 3 to Router 4.',
     analogy: 'Like solving a customized math problem that only someone with the official company signet ring and today’s password can solve.',
-    whatHappensNext: 'The Root of Trust receives the response and compares the cryptographic signature and fingerprint against its expected values.',
+    whatHappensNext: 'The Root of Trust receives the response and compares the keyed tag and firmware fingerprint against its expected values.',
     realWorldSignificance: 'Even if an attacker intercepts this response, they cannot reverse-engineer the secret key or reuse the response for a different challenge.',
     attemptedAction: 'Cryptographic response transmission with firmware proof.',
     initiatedBy: 'Tile 3 (PQ-Attest endpoint).',
@@ -503,15 +503,15 @@ export const SCENARIO_LEARNING: Record<string, EventLearning> = {
   },
   'acc-1': {
     eventId: 'acc-1',
-    whatIsHappening: 'Tile 3 writes the hex value 0xC0DE5A5A to the Shared Memory on Tile 2. The packet travels across the network through Routers 3, 4, 5, and then 2.',
-    whyHappening: 'CPU A needs to store calculation results in shared memory. Now that it is verified, it is permitted to send memory packets.',
-    howItWorks: 'The processor writes to a shared address. Its bus bridge checks that Tile 3 is authorized, converts the write into a network packet on Virtual Channel 0, and routes it along X first (3 → 4 → 5), then Y (5 → 2).',
-    analogy: 'An authorized employee carrying a sealed document walks down the main hallway and delivers it to the company filing vault.',
-    whatHappensNext: 'The Memory Front End on Tile 2 inspects the incoming packet and verifies Tile 3’s authorization status before performing the write.',
-    realWorldSignificance: 'Routing packets across the network follows strict XY rules to prevent gridlock, and packets travel on dedicated memory channels.',
+    whatIsHappening: 'CPU A on Tile 3 asks Tile 2 to store the word 0xC0DE5A5A at address 0x22000100.',
+    whyHappening: 'The firmware writes a known number so it can read it back and check that memory held the right value.',
+    howItWorks: 'The bridge checks Tile 3’s grant and forms a write packet. Routers 3, 4 and 5 pass it across the row, then router 2 delivers it to the memory tile.',
+    analogy: 'Think of the address as a numbered locker. The value is what the sender wants placed inside.',
+    whatHappensNext: 'After memory stores the word, Tile 2 sends a receipt back to Tile 3.',
+    realWorldSignificance: 'A grant changes what the processor can actually do. Its request can now reach shared memory.',
     attemptedAction: 'Writing 32-bit word 0xC0DE5A5A into shared memory.',
     initiatedBy: 'Tile 3 (RISC-V CPU A).',
-    checksPerformed: 'Tile 3 local bridge authorization check; XY routing path verification.',
+    checksPerformed: 'The sending bridge checks authorization. The memory front end also checks permission before it commits the write.',
     checkingComponent: 'Tile 3 bridge (cpuA.bridge) and Memory Front End (memfe).',
     resultStatus: 'Accepted',
     resultCategory: 'ok',
@@ -520,12 +520,12 @@ export const SCENARIO_LEARNING: Record<string, EventLearning> = {
   },
   'acc-2': {
     eventId: 'acc-2',
-    whatIsHappening: 'The Shared Memory confirms the write was successful and sends back an acknowledgement packet to Tile 3 through Routers 2, 1, 0, and 3.',
-    whyHappening: 'In computing, the processor must be certain its write completed before it continues executing further instructions.',
-    howItWorks: 'The Memory Front End writes the 4 bytes into Block RAM, packages an acknowledgement flit, and dispatches it over Virtual Channel 1 (dedicated to memory replies).',
-    analogy: 'The vault manager hands the employee a signed delivery receipt confirming the deposit was placed safely in the safe.',
-    whatHappensNext: 'Tile 3 receives the confirmation, completing the write transaction.',
-    realWorldSignificance: 'Using a separate virtual channel (VC1) for responses guarantees that replies never get stuck behind a queue of incoming requests, avoiding protocol deadlocks.',
+    whatIsHappening: 'Tile 2 returns an acknowledgment (ACK) for the write.',
+    whyHappening: 'Tile 3 needs to know when its request has finished.',
+    howItWorks: 'The memory front end sends a reply on the response channel, VC1. Routers 2, 1, 0 and 3 carry it back to Tile 3’s bridge.',
+    analogy: 'An ACK works like a delivery receipt. It confirms the delivery without carrying the parcel back.',
+    whatHappensNext: 'In the full walkthrough, Tile 3 reads the same address and compares the returned word with the value it wrote.',
+    realWorldSignificance: 'Receiving a receipt and checking the saved value are separate observations. The firmware prints T3 PASS only after the readback check.',
     attemptedAction: 'Write acknowledgement transmission.',
     initiatedBy: 'Tile 2 (Memory Front End / BRAM).',
     checksPerformed: 'Block RAM write timing and VC1 credit availability.',
@@ -571,12 +571,12 @@ export const SCENARIO_LEARNING: Record<string, EventLearning> = {
   },
   'ref-1': {
     eventId: 'ref-1',
-    whatIsHappening: 'Tile 0 (CPU B) attempts to write to the shared memory, but its own local bridge stops the request. No packet ever enters the network. It prints "T0 REFUSED" and the RGB LED turns red.',
-    whyHappening: 'Tile 0 was never attested or authorized. The system proves that untrusted processors are blocked locally before they can even touch network wires.',
-    howItWorks: 'CPU B issues a write bus command. Its local bridge (cpuB.bridge) checks its internal authorization flag. Seeing it is FALSE, the bridge refuses to assert a network request, poisons the CPU bus response, and redirects CPU B to its refusal handler.',
-    analogy: 'An unvetted contractor tries to open their office door to go to the vault, but the door is locked from the outside. They never even make it into the hallway.',
-    whatHappensNext: 'CPU B handles the error, prints "T0 REFUSED" to the UART, and activates the red warning LED.',
-    realWorldSignificance: 'Local refusal prevents untrusted cores from wasting network bandwidth, launching denial-of-service floods, or snooping on memory traffic.',
+    whatIsHappening: 'CPU B on Tile 0 asks to save 0xB0B0B0B0 at the same address in Tile 2.',
+    whyHappening: 'This gives the demo a comparison. Both programs use the same memory address, but only Tile 3 has a grant.',
+    howItWorks: 'Tile 0’s bridge checks its authorization flag. The flag is clear, so the bridge returns a local refusal before it creates a network request.',
+    analogy: 'The guard stops the parcel at the sender’s door. There is nothing for a courier to deliver.',
+    whatHappensNext: 'After the refusal checks, CPU B reports T0 REFUSED. Shared memory still contains Tile 3’s word.',
+    realWorldSignificance: 'The quiet network is the evidence to look for. Tile 2 never receives a write from Tile 0 in this test.',
     attemptedAction: 'Unauthorized write attempt by unvetted processor (CPU B).',
     initiatedBy: 'Tile 0 (RISC-V CPU B).',
     checksPerformed: 'Local bridge authorization clearance check.',
@@ -590,8 +590,8 @@ export const SCENARIO_LEARNING: Record<string, EventLearning> = {
     eventId: 'rev-1',
     whatIsHappening: 'Button 2 is pressed on the board, and the Root of Trust sends an authenticated REVOKE packet to Tile 3. Tile 3’s lock snaps shut and LED 0 goes out.',
     whyHappening: 'Trust is not permanent. If a threat is detected or a security epoch ends, the Root of Trust must be able to cancel privileges immediately while the chip continues running.',
-    howItWorks: 'Tile 4 generates an authenticated REVOKE packet and transmits it across the network. Tile 3’s network interface receives the packet, validates the signature, and clears its authorization register back to FALSE.',
-    analogy: 'A security officer presses a button that instantly cancels your badge access; the electronic lock clicks shut and the green indicator light turns off.',
+    howItWorks: 'Tile 4 generates an authenticated REVOKE packet and transmits it across the network. Tile 3’s network interface receives the packet, validates the tag, and clears its authorization register back to FALSE.',
+    analogy: 'A badge office sends a cancellation. Once the door controller applies it, the badge stops opening that door.',
     whatHappensNext: 'Tile 3 is now stripped of all privileges. Any subsequent attempt to access shared memory will be refused.',
     realWorldSignificance: 'Proves the system supports dynamic real-time revocation. Security can be revoked in microseconds without needing a full system reboot or power cycle.',
     attemptedAction: 'Dynamic privilege revocation.',
@@ -679,7 +679,7 @@ export const HOW_LEARNING: HowStepLearning[] = [
     howItWorks: 'The PQ-Attest endpoint seals the measurement and challenge nonce using KMAC128, creating a 512-bit response payload sent back across the network to Tile 4.',
     analogy: 'Tile 3 stamps the answer with an official wax seal using an exclusive royal signet ring and sends it back by courier.',
     whatHappensNext: 'The Root of Trust inspects the seal and compares the fingerprint against its golden standard.',
-    realWorldSignificance: 'Only genuine hardware running the approved software can produce a signature the Root of Trust accepts.'
+    realWorldSignificance: 'The verifier checks that the response authenticates the expected firmware measurement for the current challenge.'
   },
   {
     stepIndex: 4,
@@ -726,8 +726,8 @@ export const HOW_LEARNING: HowStepLearning[] = [
     title: 'Revoke',
     whatIsHappening: 'Button 2 is pressed, and the Root of Trust revokes Tile 3’s access. The lock closes, LED 0 turns off, and Tile 3’s next memory request is stopped by its own bridge.',
     whyHappening: 'Trust must never be permanent. If a threat is detected, privileges must be stripped immediately.',
-    howItWorks: 'Tile 4 sends an authenticated REVOKE packet. Tile 3 clears its authorization flag to FALSE, instantly re-locking its bridge.',
-    analogy: 'A security officer clicks a master button that instantly disables an employee’s keycard; the security door immediately re-locks.',
+    howItWorks: 'Tile 4 sends an authenticated REVOKE packet. Tile 3 clears its authorization flag to FALSE, blocking subsequent requests at its bridge.',
+    analogy: 'A badge reader refuses the next entry once the cancellation reaches it.',
     whatHappensNext: 'Tile 3 is now completely blocked until a new attestation handshake is completed.',
     realWorldSignificance: 'Allows immediate containment of compromised units without requiring a full chip reboot.'
   },
@@ -736,10 +736,10 @@ export const HOW_LEARNING: HowStepLearning[] = [
     title: 'Forged packet',
     whatIsHappening: 'A forged packet is injected through the untrusted port (Tile 5) and is rejected by the quarantine. (Shown in simulation; the port is tied off on the physical board).',
     whyHappening: 'Tests whether an attacker connecting to external pins can inject fake control packets into the on-chip network.',
-    howItWorks: 'The Ingress Quarantine holds incoming packets in an isolation buffer, verifies the Layer-2 KMAC tag and sequence counter, detects the counterfeit signature, and destroys the packet.',
+    howItWorks: 'In the simulated injection test the untrusted ingress holds and rejects the forged control packet.',
     analogy: 'A suspicious parcel from an unknown sender arrives at the mailroom; the x-ray scanner detects a hazard and the parcel is incinerated.',
-    whatHappensNext: 'The demonstration concludes with all security properties verified.',
-    realWorldSignificance: 'Guarantees boundary protection: external pins cannot be exploited to bypass internal cryptographic defenses.'
+    whatHappensNext: 'The walkthrough ends with the observed rejection in simulation.',
+    realWorldSignificance: 'The injected packet was contained in the tested configuration. The external port is tied off on the board image.'
   }
 ];
 

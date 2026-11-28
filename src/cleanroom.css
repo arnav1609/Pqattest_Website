@@ -23,3 +23,12 @@ body.intro-only #main>#explore[hidden]{display:flex!important;visibility:hidden;
 #cleanroom :is(.room-person,.room-chip){background:var(--charcoal);color:var(--sand);border-color:var(--line)}
 #cleanroom :is(.room-person,.room-chip):is(:hover,:focus-visible){border-color:var(--blue)}
 .cloud-curtain i {background:radial-gradient(ellipse at 45% 60%,#e8e3da 30%,#b9bdc1 65%,transparent 74%)}
+
+.room-note { position: absolute; z-index: 2; bottom: max(12px, env(safe-area-inset-bottom)); left: 14px; margin: 0; padding: 6px 10px; border-radius: 4px; background: #171b20e8; color: #f3ebdf; font: 500 12px/1.4 var(--sans); pointer-events: none; }
+.room-guide[open] { width: min(540px, 94vw); max-height: 88dvh; overflow-y: auto; }
+.room-guide[open] nav { flex-wrap: wrap; }
+.room-guide[open] p { line-height: 1.55; }
+.research-questions { padding-inline-start: 1.6em; margin: 20px 0 0; }
+.research-questions li { padding-inline-start: 4px; }
+.research-questions li::marker { font-family: var(--mono); color: var(--blue); }
+.research-questions h3 { margin: 12px 0 4px; font-size: 1.05rem; }

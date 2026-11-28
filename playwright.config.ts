@@ -7,6 +7,6 @@ export default defineConfig({
   workers: 1,            // software-rendered WebGL: parallel pages starve each other
   retries: 0,
   reporter: [['list']],
-  use: { baseURL: 'http://127.0.0.1:4173', viewport: { width: 1440, height: 900 }, launchOptions: { args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] } },
+  use: { baseURL: 'http://127.0.0.1:4173', viewport: { width: 1440, height: 900 }, launchOptions: { channel: process.env.PQ_CHROME_CHANNEL || undefined, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] } },
   webServer: { command: 'npx vite preview --port 4173 --strictPort --host 127.0.0.1', url: 'http://127.0.0.1:4173', reuseExistingServer: true, timeout: 60_000 }
 });
