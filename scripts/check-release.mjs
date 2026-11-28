@@ -86,5 +86,19 @@ try {
       await context.close();
     }
   }
+  const touch = await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',offline:true});
+  const phone = await touch.newPage();
+  await phone.goto(offline+'#explore');
+  await phone.waitForFunction(() => window.__pq?.api?.ok);
+  const label = phone.locator('#stage .lab.on[data-sel]').first();
+  const block = await label.getAttribute('data-sel');
+  await label.tap();
+  await phone.waitForFunction(id => {
+    const card = document.querySelector('#insp');
+    const stats = card?.querySelector('.stats')?.getBoundingClientRect();
+    return window.__pq.st.sel === id && document.activeElement === card && stats && stats.top >= 0 && stats.bottom <= innerHeight;
+  }, block);
+  console.log('PASS offline phone 3D label tap and animated scroll to resource figures');
+  await touch.close();
 } finally {await browser?.close();server.close();}
 

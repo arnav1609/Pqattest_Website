@@ -462,7 +462,7 @@ pre { overflow-x: auto; background: var(--raised); padding: 12px; border-radius:
 .mesh-map button { z-index:1; width:80%; min-height:58px; line-height:1.2; padding:4px; font-size:13px; }
 .mesh-map b { display:block; }
 .mesh-map .carrying { border-color:#89baff; background:#243955; }
-.mesh-packet { position:absolute; z-index:2; pointer-events:none; background:#97c6ff; border:2px solid #193148; width:13px; height:13px; transform:translate(-50%,14px); }
+.mesh-packet { position:absolute; z-index:2; pointer-events:none; background:#97c6ff; border:2px solid #193148; width:13px; height:13px; transform:translate(-50%,28px); }
 .mesh-packet[data-kind="vc1"] { border-radius:50%; }
 .mesh-location { text-align:center; }
 .fallback-route button { min-height:32px; padding:2px 6px; font-size:13px; }

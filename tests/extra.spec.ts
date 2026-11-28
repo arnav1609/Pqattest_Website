@@ -75,7 +75,7 @@ test('tile card: every tile shows name, purpose, resources, what it does and its
     await expect(page.locator(`.tilebar [data-tile="${t}"]`)).toHaveAttribute('aria-pressed', 'true');
   }
   await page.locator('.tilebar [data-tile="2"]').click(); await page.locator('#insp ul.parts button', { hasText: 'Memory front end' }).click();
-  await expect(page.locator('#insp .stats')).toContainText('Not separately measured');
+  await expect(page.locator('#insp > .stats')).toContainText('Not separately measured');
   await expect(page.locator('#insp')).not.toContainText('NaN');
 });
 

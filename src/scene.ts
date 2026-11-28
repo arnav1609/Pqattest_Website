@@ -320,7 +320,11 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
   };
   const tw = { on: false, t: 0, p0: new THREE.Vector3(), p1: new THREE.Vector3(), g0: new THREE.Vector3(), g1: new THREE.Vector3() };
   function setView(name: string, instant = false) { const v = VIEWS[name]; if (!v) return; tw.p1.fromArray(v[0]); tw.g1.fromArray(v[1]); if (phone) tw.p1.sub(tw.g1).multiplyScalar(name === 'top' || name === 'angled' ? 1.12 : 1.5).add(tw.g1);
-    if (instant || reduce) { cam.position.copy(tw.p1); ctl.target.copy(tw.g1); ctl.update(); tw.on = false; ctl.enabled = true; dirty = camMoved = true; return; }
+    if (instant || reduce) {
+      cam.position.copy(tw.p1); ctl.target.copy(tw.g1); ctl.update();
+      cam.updateMatrixWorld(); bd.visible = cam.position.y > -1;
+      tw.on = false; ctl.enabled = true; dirty = camMoved = true; return;
+    }
     tw.p0.copy(cam.position); tw.g0.copy(ctl.target); tw.t = 0; tw.on = true; ctl.enabled = false; }
   const sph = new THREE.Spherical();
   function stepCamera(dir: string) { v1.copy(cam.position).sub(ctl.target); sph.setFromVector3(v1);
@@ -554,6 +558,7 @@ export function createScene(host: HTMLElement, labelLayer: HTMLElement, reduce: 
     for (const m of subs) { const ty = m.userData.y0 + m.userData.lift; if (Math.abs(m.position.y - ty) > 0.002) { m.position.y += (ty - m.position.y) * Math.min(1, dt * 0.012); animating = true; } }
     if (outline.visible && animating) outline.update();
     ctl.update(); bd.visible = cam.position.y > -1;                         // from below, the board is hidden so the ball grid can be seen
+    if (camMoved) cam.updateMatrixWorld(); // project labels using the current pose before rendering
     if (camMoved) { camMoved = false; layoutLabels(); }
     if (dirty || animating) { positionTag(); dirty = false; renderer.render(scene, cam); } }
   requestAnimationFrame(frame);

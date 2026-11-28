@@ -133,7 +133,9 @@ export function mountRoom(enterExplorer: () => DOMRect | undefined, finishEntran
    const charcoal = getComputedStyle(layer).backgroundColor;
    layer.animate([{backgroundColor:charcoal}, {offset:liftEnd,backgroundColor:charcoal},
      {backgroundColor:'transparent'}],timing);
+   const finishTimer = window.setTimeout(() => motion.finish(), timing.duration + 150);
    try {await motion.finished;} finally {
+     clearTimeout(finishTimer);
      canvas.style.cssText=style;
      parent.insertBefore(canvas,next);
      layer.remove();
